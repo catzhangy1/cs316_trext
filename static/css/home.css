@@ -1,0 +1,37 @@
+.cover-heading {
+    horizontal-align: middle;
+}
+
+.inner-cover .a {
+    font-weight: bold;
+}
+
+.inner-cover div.inline {
+    float:left;
+}
+
+.title .b {
+    transform: scale(1,1);
+    transition: 1s;
+}
+.title .c {
+    transform: scale(1,0);
+    transition: 1s;
+}
+
+.title .d {
+    transform: scale(0,1);
+    transition: 1s;
+}
+
+.titleline {
+    display: inline-block;
+    text-align: center;
+}
+
+#jetBlue {
+    -webkit-animation-delay: 5s; /* Chrome, Safari, Opera */
+    animation-delay: 5s;
+    opacity:0;
+    transition: 1s;
+}

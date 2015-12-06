@@ -1,0 +1,135 @@
+<!--<section class="demo-container md-whiteframe-z1"-->
+         <!--ng-class="{'show-source': demoCtrl.$showSource}" >-->
+
+    <!--<md-toolbar class="demo-toolbar md-primary">-->
+        <!--<div class="md-toolbar-tools">-->
+            <!--<h3>{{demoCtrl.demoTitle}}</h3>-->
+            <!--<span flex></span>-->
+            <!--<md-button-->
+                    <!--class="md-icon-button"-->
+                    <!--aria-label="View Source"-->
+                    <!--ng-class="{ active: demoCtrl.$showSource }"-->
+                    <!--ng-click="demoCtrl.$showSource = !demoCtrl.$showSource">-->
+                <!--<md-tooltip md-autohide>View Source</md-tooltip>-->
+                <!--<md-icon md-svg-src="img/icons/ic_code_24px.svg"></md-icon>-->
+            <!--</md-button>-->
+            <!--<md-button-->
+                    <!--ng-hide="{{exampleNotEditable}}"-->
+                    <!--hide-sm-->
+                    <!--ng-click="demoCtrl.editOnCodepen()"-->
+                    <!--aria-label="Edit on CodePen"-->
+                    <!--class="md-icon-button">-->
+                <!--<md-tooltip md-autohide>Edit on CodePen</md-tooltip>-->
+                <!--<md-icon md-svg-src="img/icons/codepen-logo.svg"></md-icon>-->
+            <!--</md-button>-->
+        <!--</div>-->
+    <!--</md-toolbar>-->
+
+    <!--&lt;!&ndash; Source views &ndash;&gt;-->
+    <!--<md-tabs class="demo-source-tabs md-primary" ng-show="demoCtrl.$showSource" style="min-height: 0;">-->
+        <!--<md-tab ng-repeat="file in demoCtrl.orderedFiles" label="{{file.name}}">-->
+            <!--<md-content md-scroll-y class="demo-source-container">-->
+                <!--<hljs class="no-header" code="file.contentsPromise" lang="{{file.fileType}}" should-interpolate="demoCtrl.interpolateCode">-->
+                <!--</hljs>-->
+            <!--</md-content>-->
+        <!--</md-tab>-->
+    <!--</md-tabs>-->
+
+    <!--&lt;!&ndash; Live Demos &ndash;&gt;-->
+    <!--<demo-include files="demoCtrl.files" module="demoCtrl.demoModule" class="{{demoCtrl.demoId}}">-->
+    <!--</demo-include>-->
+<!--</section>-->
+<div ng-controller="EditorController" layout="column" ng-cloak>
+    <md-content class="md-padding" layout="column">
+        <h2 class="md-title">Locations - Up to 3</h2>
+        <md-chips
+                ng-model="locations"
+                class="custom-chips"
+                readonly="readonly"
+                placeholder="+Location"
+                secondary-placeholder="Durham,North Carolina"
+                md-require-match="locationsCheck"
+                delete-button-label="Remove location"
+                delete-hint="Press delete to remove tag">
+                <md-chip-template>
+                    <span>
+                        <strong> [{{$index}}] {{$chip}}</strong>
+                    </span>
+                </md-chip-template>
+        </md-chips>
+        <br/>
+
+        <h2 class="md-title">Activities</h2>
+        <md-chips ng-model="activities" md-autocomplete-snap
+                  md-require-match="autocompleteDemoRequireMatch"
+                  placeholder="Biking, Nightlife, Spa"
+                  secondary-placeholder="+Activity">
+            <md-autocomplete
+                    md-selected-item="selectedItem"
+                    md-search-text="searchText"
+                    md-items="item in querySearch(searchText)"
+                    md-item-text="item.title"
+                    secondary-placeholder="Biking, Nightlife, Spa">
+                <span md-highlight-text="searchText">{{item.title}}</span>
+            </md-autocomplete>
+            <md-chip-template>
+                    <span>
+                        <strong> [{{$index}}] {{$chip.title}} : <i>{{$chip._parent}}</i></strong>
+                    </span>
+            </md-chip-template>
+        </md-chips>
+
+        <h2 class="md-title">Destinations</h2>
+        <md-chips
+                ng-model="destinations"
+                class="custom-chips"
+                readonly="readonly"
+                placeholder="+Destination"
+                secondary-placeholder="Durham Bulls Park"
+                delete-button-label="Remove Destination"
+                delete-hint="Press delete to remove tag">
+            <md-chip-template>
+                    <span>
+                        <strong> [{{$index}}] {{$chip}}</strong>
+                    </span>
+            </md-chip-template>
+        </md-chips>
+        <br/>
+
+
+
+        <h2 class="md-title">Budget</h2>
+        <md-list>
+            <md-list-item md-no-ink
+                            class="md-2-line veggie-option" ng-repeat="price in prices"
+                          layout="row"
+                          layout-align="space-around center"
+                          layout-wrap>
+                <div class="md-item-text md-whiteframe-z1" flex>
+
+                <md-checkbox md-no-ink aria-label="price.price" ng-model="price.selected">
+                    <h3>{{price.price}}</h3>
+                </md-checkbox>
+                    </div>
+            </md-list-item>
+        </md-list>
+
+        <h3>Trip Load</h3>
+        <div layout>
+            <div flex="10" layout layout-align="center center">
+                <span class="md-body-1">1 (Light) - 5 (Hardcore)</span>
+            </div>
+            <md-slider flex md-discrete ng-model="maxdest" step="1" min="1" max="5" aria-label="maxdest">
+            </md-slider>
+        </div>
+
+        <section layout="row" layout-align="center center" layout-wrap>
+            <md-button class="md-warn md-raised md-hue-2" style="width: 120px" ng-click="submit()">
+                <md-icon md-svg-icon="../static/img/ic_check_circle_white_24px.svg"></md-icon> Submit </md-button>
+            <md-button class="md-warn md-raised md-hue-2" ng-click="randomize()">
+                <md-icon md-svg-icon="../static/img/ic_grade_white_24px.svg"></md-icon> Randomize </md-button>
+            <md-button class="md-warn md-raised md-hue-2" ng-click="reload()">
+                <md-icon md-svg-icon="../static/img/ic_highlight_off_white_24px.svg"></md-icon>Start Over</md-button>
+        </section>
+    </md-content>
+</div>

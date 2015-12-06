@@ -1,0 +1,20 @@
+
+        <p class="lead">Here are your results</p>
+        <div class="result-container" ng-controller ="ResultsCtrl">
+            <div class ="header">
+                <span> {{result.Origin}} <i>to</i> {{result.Destination}} </span>
+            </div>
+            <p> <i> At the </i> {{result.Hotel}}</p>
+            <p> {{result.CheckIn}} to {{result.CheckOut}}</p>
+            <hr />
+            <p> Expedia price = {{result.Expedia}}</p>
+            <p> JetBlue price = {{result.JetBlue}}</p>
+            <hr />
+            <p style = "color: red; font-size: 14px"> <strong> You Save: {{result.Save}} % </strong> </p>
+            <div class = "footer">
+                    <a href="http://www.jetblue.com"> Book Now!</a>
+            </div>
+            <div class = "footer-2">
+                <a ng-click = "reloadRoute()"> Feeling adventurous still! </a>
+            </div>
+</div>
