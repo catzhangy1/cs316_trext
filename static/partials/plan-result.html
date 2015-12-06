@@ -1,20 +1,42 @@
+<div ng-controller="PlanResultController" >
+    <md-content class="md-padding" layout="column">
+        <md-toolbar class="md-theme-light">
+            <h2 class="md-toolbar-tools">
+                <span> Your Itinerary </span>
+            </h2>
+        </md-toolbar>
+        <md-content>
+            <md-list>
+                <md-list-item class="md-3-line" ng-repeat="item in results">
+                    <div class="md-list-item-text">
+                        <h3>{{item.name}}</h3>
+                        <h4> <i> {{item.category}} </i> </h4>
+                        <p>{{item.address}}</p>
+                        <p>{{item.phone}}</p>
+                    </div>
+                    <md-button class="md-icon-button reposition" aria-label="More" ng-click="delete(item)">
+                        <md-icon md-svg-icon="../static/img/ic_clear_black_24px.svg"></md-icon>
+                    </md-button>
 
-<p class="lead">Here are your results</p>
-<div class="result-container" ng-controller ="PlanResultController">
-    <div class ="header">
-        <span> {{result.Origin}} <i>to</i> {{result.Destination}} </span>
-    </div>
-    <p> <i> At the </i> {{result.Hotel}}</p>
-    <p> {{result.CheckIn}} to {{result.CheckOut}}</p>
-    <hr />
-    <p> Expedia price = {{result.Expedia}}</p>
-    <p> JetBlue price = {{result.JetBlue}}</p>
-    <hr />
-    <p style = "color: red; font-size: 14px"> <strong> You Save: {{result.Save}} % </strong> </p>
-    <div class = "footer">
-        <a href="http://www.jetblue.com"> Book Now!</a>
-    </div>
-    <div class = "footer-2">
-        <a ng-click = "reloadRoute()"> Feeling adventurous still! </a>
-    </div>
+                    <md-divider ng-if="true"></md-divider>
+                </md-list-item>
+            </md-list>
+        </md-content>
+
+        <!--<div class="col-md-6">-->
+            <div id="map" style="width:500px; height:500px">I am here</div>
+            <div id="repeat" ng-repeat="marker in markers | orderBy : 'title'">
+                <a id="country_container" href="#" ng-click="openInfoWindow($event, marker)">
+                    <label id="names" >{{marker.title}}</label></a>
+            </div>
+        <!--</div>-->
+        <section layout="row" layout-align="center center" layout-wrap>
+            <md-button class="md-warn md-raised md-hue-2" ng-click="submit()">
+                <md-icon md-svg-icon="../static/img/ic_check_circle_white_24px.svg"></md-icon> Update Route </md-button>
+            <md-button class="md-warn md-raised md-hue-2" ng-click="saveTrip()">
+                <md-icon md-svg-icon="../static/img/ic_grade_white_24px.svg"></md-icon> Save </md-button>
+            <md-button class="md-warn md-raised md-hue-2" ng-click="navigateBack()">
+                <md-icon md-svg-icon="../static/img/ic_highlight_off_white_24px.svg"></md-icon> Back to Edit </md-button>
+        </section>
+    </md-content>
 </div>
