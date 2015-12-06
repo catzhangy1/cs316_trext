@@ -14,11 +14,11 @@ def connect_db():
     #     host='localhost',
     # )
     db = psycopg2.connect(
-        database='htencuzl',
-        user='htencuzl',
-        password='TSYmXOOWqoFMEQAx1lfRa3JZ2BbY-H6-',
-        port='5432',
-        host='pellefant-01.db.elephantsql.com',
+        database='316',
+        user='postgres',
+        password="postgres",
+        port='5433',
+        host='localhost',
     )
     return db
 
@@ -37,7 +37,8 @@ def reset_tables(db):
 
 
 # Add entries into database. Must be well-formed.
-def insert_into_db(db, entries=[], table="jetblue_data"):
+#order is switched
+def insert_into_db(db, table,entries=[]):
     for shit in entries:
         print shit
     if db and entries:
@@ -84,13 +85,51 @@ def field_query(db, fields=[], table="jetblue_data"):
         )
 
 
+#Get all users
+def field_query_all_users(db, table,fields=[],):
+    if not fields:
+        return query(
+            db,
+            "SELECT * FROM %s LIMIT 10" % table,
+        )
+    else:
+        # FIX POTENTIAL SQL INJECTION #
+        return query(
+            db,
+            ''.join([
+                "SELECT * FROM %s WHERE " % table,
+                ' AND '.join(
+                    ["%s = %s" % (f[0], f[1]) for f in fields.items()],
+                ),
+            ]),
+        )
+
+#Get attractions
+def field_query_all_attractions(db, fields=[], table="Attractions"):
+    if not fields:
+        return query(
+            db,
+            "SELECT * FROM %s LIMIT 10" % table,
+        )
+    else:
+        # FIX POTENTIAL SQL INJECTION #
+        return query(
+            db,
+            ''.join([
+                "SELECT * FROM %s WHERE " % table,
+                ' AND '.join(
+                    ["%s = %s" % (f[0], f[1]) for f in fields.items()],
+                ),
+            ]),
+        )
+
 # Executes a Flask friendly query by returning a formatted string
-def flask_field_query(db, fields=[], table="jetblue_data"):
+def flask_field_query_user(db, fields=[], table="Users"):
     results = field_query(db, fields, table)
     return '@'.join(['*'.join([str(x) for x in y]) for y in results])
-
-
-# Populate the jetblue_data table with initial dataset
-def insert_initial_jetblue_data(db):
-    import resume_parser
-    insert_into_db(db, resume_parser.parseResume())
+def flask_field_query_trip(db, fields=[], table="Trips"):
+    results = field_query(db, fields, table)
+    return '@'.join(['*'.join([str(x) for x in y]) for y in results])
+def flask_field_query_attraction(db, fields=[], table="Attractions"):
+    results = field_query(db, fields, table)
+    return '@'.join(['*'.join([str(x) for x in y]) for y in results])
