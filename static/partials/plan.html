@@ -47,7 +47,7 @@
                 class="custom-chips"
                 readonly="readonly"
                 placeholder="+Location"
-                secondary-placeholder="Durham,North Carolina"
+                secondary-placeholder="Durham,NC"
                 md-require-match="locationsCheck"
                 delete-button-label="Remove location"
                 delete-hint="Press delete to remove tag">
@@ -69,7 +69,7 @@
                     md-search-text="searchText"
                     md-items="item in querySearch(searchText)"
                     md-item-text="item.title"
-                    secondary-placeholder="Biking, Nightlife, Spa">
+                    placeholder="Biking, Nightlife, Spa">
                 <span md-highlight-text="searchText">{{item.title}}</span>
             </md-autocomplete>
             <md-chip-template>
@@ -131,5 +131,8 @@
             <md-button class="md-warn md-raised md-hue-2" ng-click="reload()">
                 <md-icon md-svg-icon="../static/img/ic_highlight_off_white_24px.svg"></md-icon>Start Over</md-button>
         </section>
+        <div layout="row" layout-sm="column" layout-align="space-around">
+            <md-progress-circular md-mode="{{loading}}" md-diameter="96"></md-progress-circular>
+        </div>
     </md-content>
 </div>

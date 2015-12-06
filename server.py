@@ -79,13 +79,17 @@ def search():
         n = randint(0,len(temp_search)-1)
         results_search.append(temp_search[n])
         final_dest_num =- 1
-    print 'BEGIN HERE'
-    print "@".join([str(x) for x in results_search[0]])
     return json.dumps(results_search)
+
+@app.route('/save', methods=['POST'])
+def save():
+    '''add save trip method: for now request data dosn't have user's ID, just hardcode one'''
+    data = ast.literal_eval(request.data)
+
+    return "success"
 
 @app.route("/")
 def main():
-    print 'yes'
     return render_template('index.html', name='hello')
 
 if __name__ == "__main__":
