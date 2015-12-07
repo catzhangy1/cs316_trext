@@ -1,17 +1,85 @@
 angular.module('app.controllers', [
 
 ])
-    .controller('LoginController', function ($scope, $location, $rootScope) {
+    .controller('LoginController', function ($http, $scope, $location, $rootScope, dataService) {
+        //console.log("test login controller")
         $scope.submit = function () {
-            if($scope.username == 'admin' && $scope.password == 'admin'){
-                console.log("here");
-                $rootScope.loggedIn = true;
-                $location.path('/post')
-            }else{
-                alert('Wrong Password');
-            }
-        };
+            var user = [];
+            user.push({
+                username: $scope.username,
+                password: $scope.password
+            });
+            var str = JSON.stringify(user);
+            //server.log(str);
+            $scope.loading = 'indeterminate';
+            $http({method: 'POST',
+                url: '/login',
+                data: str,
+                responseType: 'json',
+                ContentType: 'json/application'
+            }).success(function (results) {
+                if(results === "True"){
+                    $rootScope.loggedIn = true;
+                    dataService.authenticate({username:$scope.username});
+                    alert('Login Successful');
+                    $location.path('/home');
+                }
+                else {
+                    alert('Wrong Username/Password');
+                }
+
+            }).error(function (error) {
+                $scope.loading = null;
+                alert('Wrong Username/Password');
+            });
+
+//          for(var i=0; i<users.length;i++){
+//              if($scope.username == users[i].username && $scope.password == users[i].password){
+//                  console.log("password correct");
+//                  $rootScope.loggedIn = true;
+//                  $location.path('/post')
+//              }
+//          }
+//              if($rootScope.loggedIn != true){
+//                alert('Wrong Password');
+//              }
+        };//end submit function
+        $scope.register = function () {
+            var user = [];
+            user.push({
+                username: $scope.username,
+                password: $scope.password
+            });
+            var str = JSON.stringify(user);
+            //console.log(str);
+            $scope.loading = 'indeterminate';
+            $http({method: 'POST',
+                url: '/register',
+                data: str,
+                responseType: 'json',
+                ContentType: 'json/application'
+            }).success(function (results) {
+                dataService.authenticate({username:$scope.username});
+                //server.log(results);
+                alert('Registration Successful');
+                $location.path('/home');
+            }).error(function (error) {
+                $scope.loading = null;
+                //server.log(error);
+                alert('Registration Unsuccessful');
+            });
+//          if($scope.password!=$scope.password1){
+//              alert('Passwords dont match');
+//          }else{
+//              users.push({
+//                    username: $scope.username,
+//                    password: $scope.password
+//              });
+//          }
+//        alert('Trying to Register');
+        }//end register function
     })
+
 
     /*
         Controller for landing page.
@@ -30,41 +98,6 @@ angular.module('app.controllers', [
         //};
     }])
 
-    /*
-        Controller for sharing trip via email
-     */
-    .controller('NotifyCtrl',
-    ['$scope','$log','$http',
-        function($scope, $log, $http) {
-            $scope.name = '';
-            $scope.rEmail = '';
-            $scope.sEmail = '';
-
-            $scope.submit = function() {
-                if($scope.name == '' && $scope.rEmail == '' && $scope.sEmail == ''){
-                    return;
-                }
-
-                $log.log($scope.name);
-                $log.log($scope.rEmail);
-                $log.log($scope.sEmail);
-                var data = [$scope.name, $scope.rEmail, $scope.sEmail];
-                var obj = {name: $scope.name, rEmail: $scope.rEmail, sEmail: $scope.sEmail};
-                $log.log(data.join(" "));
-                $http({method: "POST", url:"/notify", data:data}).
-                    success(function(results){
-                        $log.log(results);
-                        $scope.message = "Success!";
-                        $scope.list = results;
-
-                    }).
-                    error(function(error){
-                        $scope.message = "Failure! Please try again later";
-                        $log.log(error);
-                    });
-            }
-        }
-    ])
 
     /*
         Controller for the editor environment
@@ -73,14 +106,6 @@ angular.module('app.controllers', [
         $scope.autocompleteDemoRequireMatch = true;
         $scope.readonly = false;
         $scope.loading = null;
-
-        $scope.prices = [
-            {'price':"$",'selected':'false'},
-            {'price':"$$",'selected':'false'},
-            {'price':"$$$",'selected':'false'},
-            {'price':"$$$$",'selected':'false'}
-        ];
-
         /*
         Input objects are initialized from dataService's TripInput
          */
@@ -89,7 +114,14 @@ angular.module('app.controllers', [
         $scope.destinations = data[1];
         $scope.activities = data[2];
         $scope.maxdest = data[3];
+        $scope.prices = data[4];
+        for(var j = 0; j < $scope.prices.length; j++){
+            if($scope.prices[j].selected){
+                $scope.budget = j+1;
+            }
+        }
 
+        $scope.tripname = "";
         /*
         Data needed for autocomplete function
          */
@@ -123,12 +155,27 @@ angular.module('app.controllers', [
             return results;
         };
 
-        $scope.submit = function(){
-            dataService.updateTripInput($scope.locations, $scope.destinations, $scope.activities, $scope.maxdest);
+        $scope.updateCheck = function(data){
+            //$log.log(data.selected);
+            var index = data.price.length - 1;
+            for(var i = 0; i < $scope.prices.length ; i++){
+                if(i != index){
+                    $scope.prices[i].selected = false;
+                }
+            }
+            $scope.budget = index + 1;
+            //$log.log($scope.budget);
+        }
 
+
+        $scope.submit = function(){
+            var finalbudget = $scope.budget + $scope.maxdest + 2;
+            dataService.updateTripInput($scope.locations, $scope.destinations, $scope.activities, $scope.maxdest, $scope.prices);
             var truncated = $scope.activities.map(function(obj) {return obj.alias});
-            var data = [$scope.locations.join("*"), $scope.destinations.join("*"), truncated.join("*"), $scope.maxdest];
+            var data = [$scope.locations.join("*"), $scope.destinations.join("*"), truncated.join("*"), finalbudget];
             $scope.loading = 'indeterminate';
+            $log.log($scope.budget);
+            $log.log($scope.maxdest);
             $http({method:'POST',
                 url: '/search',
                 data : data,
@@ -174,19 +221,73 @@ angular.module('app.controllers', [
 
     })
 
+    .controller('DialogController', function ($scope, $mdDialog, $mdToast, dataService, $http, $log) {
+        $scope.name = "";
+        $scope.email = "";
+        $scope.hide = function () {
+            $mdDialog.hide();
+        };
+        $scope.cancel = function () {
+            $mdDialog.cancel();
+        };
+        $scope.answer = function (answer) {
+            if(answer === 'send'){
+                shareTrip();
+            }
+            else{
+                $mdDialog.hide(answer);
+            }
+        }
+
+        var results = dataService.getItinerary();
+
+        var origin = "Duke Unversity";
+        var end = "UNC Chapel Hill";
+        for(var i = 0; i < results.length; i++){
+            if(results[i].isOrigin){
+                origin = results[i].name;
+            }
+            if(results[i].isDestination){
+                end = results[i].name;
+            }
+        }
+
+        shareTrip = function() {
+            var str = JSON.stringify([$scope.name, $scope.email, origin, end]);
+            $log.log(str);
+            $http({method: 'POST',
+                url: '/email',
+                data: str,
+                responseType: 'json',
+                ContentType: 'json/application'
+            }).success(function (results) {
+                alert('Success!');
+                $scope.message="SUCCESS!";
+            }).error(function (error) {
+                alert('Failed. Try again!');
+                $scope.message="Send failed; Try Again!";
+            });
+        }
+
+
+    })
     /*
         Controller for plan result display/edit:
         1) Google Maps
         2) Editing destinations from proposed itinerary
         3) Saving finalized itinerary to db
      */
-    .controller('PlanResultController', function ($scope, $location, $rootScope, $log, dataService, $window, $http) {
+    .controller('PlanResultController', function ($scope, $mdDialog, $log, dataService, $window, $http, $mdMedia) {
+        $scope.authenticated = dataService.getAuthentication();
+        $scope.user = "testuser";
+        //$scope.user = dataService.getUserInfo();
         $scope.results = dataService.getItinerary();
-
+        $log.log($scope.results);
         $scope.delete = function (item) {
             $scope.results.pop(item);
         };
-
+        $scope.o = $scope.results[0].name;
+        $scope.d = $scope.results[1].name;
         /*
         Google maps function
          */
@@ -204,21 +305,22 @@ angular.module('app.controllers', [
 
         function calculateAndDisplayRoute(directionsService, directionsDisplay) {
             var waypts = [];
-
-            for (var i = 2; i < $scope.results.length; i++) {
-                var ori = {lat: $scope.results[i].latitude, lng: $scope.results[i].longitude};
-                waypts.push({
-                    location: ori,
-                    stopover: true
-                });
-            }
-
-            //waypts.push({
-            //    location: "Duke University, Durham",
-            //    stopover: false
-            //});
             var ori = {lat: $scope.results[0].latitude, lng: $scope.results[0].longitude};
             var end = {lat: $scope.results[1].latitude, lng: $scope.results[1].longitude};
+            for (var i = 0; i < $scope.results.length; i++) {
+                var coordinate = {lat: $scope.results[i].latitude, lng: $scope.results[i].longitude};
+                if($scope.results[i].isOrigin){
+                    ori = coordinate;
+                } else if($scope.results[i].isDestination){
+                    end = coordinate;
+                } else{
+                    waypts.push({
+                        location: coordinate,
+                        stopover: true
+                    });
+                }
+
+            }
             directionsService.route({
                 origin: ori,
                 destination: end,
@@ -239,7 +341,6 @@ angular.module('app.controllers', [
         var infoWindow = new google.maps.InfoWindow();
 
         var createMarker = function (info){
-            $log.log(info);
             var marker = new google.maps.Marker({
                 map: $scope.map,
                 position: new google.maps.LatLng(info.latitude, info.longitude),
@@ -257,7 +358,6 @@ angular.module('app.controllers', [
         };
 
         for (i = 0; i < $scope.results.length; i++){
-            $log.log(i);
             createMarker($scope.results[i]);
         }
 
@@ -276,7 +376,23 @@ angular.module('app.controllers', [
             setMapOnAll(null);
         }
 
+        function processList(){
+            for(var i = 0 ; i < $scope.results.length; i++){
+                if($scope.results[i].name === $scope.o){
+                    $scope.results[i].isOrigin = true;
+                } else{
+                    $scope.results[i].isOrigin = false;
+                }
+                if($scope.results[i].name === $scope.d){
+                    $scope.results[i].isDestination = true;
+                } else{
+                    $scope.results[i].isDestination = false;
+                }
+            }
+        }
+
         $scope.submit = function() {
+            processList();
             clearMarkers();
             calculateAndDisplayRoute(directionsService, directionsDisplay);
         }
@@ -290,9 +406,11 @@ angular.module('app.controllers', [
             $window.location.href = landingUrl;
         };
 
-        $scope.saveTrip = function() {
-            var str = JSON.stringify($scope.results);
-            $log.log(str);
+        $scope.saveTrip = function(ev) {
+            var userData = {username: $scope.user.username};
+            var submit = $scope.results;
+            submit.push(userData);
+            var str = JSON.stringify(submit);
             $scope.loading = 'indeterminate';
             $http({method: 'POST',
                 url: '/save',
@@ -300,12 +418,79 @@ angular.module('app.controllers', [
                 responseType: 'json',
                 ContentType: 'json/application'
             }).success(function (results) {
+                    showConfirm(ev);
                     $log.log(results);
             }).error(function (error) {
+                    showStupid(ev);
                     $scope.loading = null;
                     $log.log(error);
             });
         };
+
+        $scope.shareTrip = function(ev) {
+            dataService.updateItinerary($scope.results);
+            showAdvanced(ev);
+        };
+        /*
+        DIALOGS TO HANDLE SAVE, SHARE, ETC.
+         */
+        showConfirm = function(ev) {
+            // Appending dialog to document.body to cover sidenav in docs app
+            var text = "Thank you, " + $scope.user.name + "! Feel free to plan another trip, share your trip, or just explore around!"
+            var confirm = $mdDialog.confirm()
+                .title('Your tripped has been saved successfully!')
+                .content(text)
+                .ariaLabel('Lucky day')
+                .targetEvent(ev)
+                .ok('Plan New Trip')
+                .cancel('Stick Around');
+            $mdDialog.show(confirm).then(function() {
+                var landingUrl = "http://" + $window.location.host + "/#/plan";
+                $window.location.href = landingUrl;
+            }, function() {
+                //do nothing!
+            });
+        };
+
+        showStupid = function(ev) {
+            // Appending dialog to document.body to cover sidenav in docs app
+            var text = "Sorry, " + $scope.user.name + "but we could not save your trip.";
+            var confirm = $mdDialog.confirm()
+                .title('Whoops!')
+                .content(text)
+                .ariaLabel('Bad day')
+                .targetEvent(ev)
+                .ok('Plan New Trip')
+                .cancel('Go to Yelp');
+            $mdDialog.show(confirm).then(function() {
+                dataService.clearResult();
+                var landingUrl = "http://" + $window.location.host + "/#/plan";
+                $window.location.href = landingUrl;
+            }, function() {
+                $window.location.href = "http://www.yelp.com";
+            });
+        };
+
+        showAdvanced = function(ev) {
+            $mdDialog.show({
+                templateUrl: '../static/partials/dialog1.tmpl.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose:true,
+                fullscreen: $mdMedia('sm') && $scope.customFullscreen
+            })
+                .then(function(answer) {
+                    $scope.status = 'You said the information was "' + answer + '".';
+                }, function() {
+                    $scope.status = 'You cancelled the dialog.';
+                });
+            $scope.$watch(function() {
+                return $mdMedia('sm');
+            }, function(sm) {
+                $scope.customFullscreen = (sm === true);
+            });
+        };
     })
+
 
 ;

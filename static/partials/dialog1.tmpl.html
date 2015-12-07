@@ -1,0 +1,47 @@
+<md-dialog ng-controller="DialogController" aria-label="share-trip"  ng-cloak>
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Share Your trip!</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-src="../static/img/ic_clear_white_24px.svg" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <h2>Your itinerary will be shared to your friend. Invite them to join Trext! :D</h2>
+                <md-input-container class="md-block">
+                    <label>Friend's Name</label>
+                    <input required name="clientName" placeholder="Professor Yang" ng-model="name">
+                    <div ng-messages="projectForm.clientName.$error">
+                        <div ng-message="required">This is required.</div>
+                    </div>
+                </md-input-container>
+                <br/>
+                <br/>
+                <md-input-container class="md-block">
+                    <label>Friend's Email</label>
+                    <input required type="email" name="clientEmail" ng-model="email"
+                           placeholder="jun.yang@duke.edu"
+                           minlength="10" maxlength="100" ng-pattern="/^.+@.+\..+$/" />
+                    <div ng-messages="projectForm.clientEmail.$error" role="alert">
+                        <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
+                            Your email must be between 10 and 100 characters long and look like an e-mail address.
+                        </div>
+                    </div>
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button ng-click="answer('cancel')">
+                Cancel
+            </md-button>
+            <md-button ng-click="answer('send')" style="margin-right:20px;">
+                Send
+            </md-button>
+            <p><i>{{message}}</i></p>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

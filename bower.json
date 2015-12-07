@@ -1,11 +1,11 @@
 {
-  "name": "ESFD",
+  "name": "Trext",
   "version": "0.0.0",
   "authors": [
     "Catherine Zhang",
-    "Addison Hu",
-    "Jackson Chang",
-    "Kai Si"
+    "Arihant Jain",
+    "Will Chang",
+    "Tze-Kang Ng"
   ],
   "license": "MIT",
   "ignore": [
