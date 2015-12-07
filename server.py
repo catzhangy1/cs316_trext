@@ -37,10 +37,14 @@ def search():
     final_dest_num = int(data[3]) - len(destination)
     for loc in location:
             for dest in destination:
+                print "destination"
+                print results_search
                 results_search.append(yelp.query_api(dest,loc))
     if (final_dest_num > 0):
         for loc in location:
             for act in activities:
+                print "hi"
+                print temp_search
                 temp_search.append(yelp.query_api(act,loc))
     while final_dest_num >0:
         n = randint(0,len(temp_search)-1)
