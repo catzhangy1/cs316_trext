@@ -63,7 +63,6 @@ angular.module('app', [
                 _itinerary = data.filter(function(obj){
                     return !(obj==null);
                 }).map(function(obj){
-                    if(obj == null) {return; }
                       var add = obj.location.display_address.join(" ");
                       return {
                           id: obj.id,

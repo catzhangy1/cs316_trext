@@ -1,17 +1,52 @@
 angular.module('app.controllers', [
 
 ])
-    .controller('LoginController', function ($scope, $location, $rootScope) {
-        $scope.submit = function () {
-            if($scope.username == 'admin' && $scope.password == 'admin'){
-                console.log("here");
-                $rootScope.loggedIn = true;
-                $location.path('/post')
-            }else{
-                alert('Wrong Password');
-            }
-        };
-    })
+//controller('LoginController', function ($scope, dataService) {
+//    $scope.submit = function () {
+//        var user = [];
+//        user.push({
+//            username: $scope.username,
+//            password: $scope.password
+//        });
+//        var str = JSON.stringify(user);
+//        $log.log(str);
+//        $scope.loading = 'indeterminate';
+//        $http({method: 'POST',
+//            url: '/login',
+//            data: str,
+//            responseType: 'json',
+//            ContentType: 'json/application'
+//        }).success(function (results) {
+//            dataService.authenticate({username:$scope.username});
+//            $log.log(results);
+//        }).error(function (error) {
+//            $scope.loading = null;
+//            $log.log(error);
+//        });
+//    };//end submit function
+//
+//    $scope.register = function () {
+//        var user = [];
+//        user.push({
+//            username: $scope.username,
+//            password: $scope.password
+//        });
+//        var str = JSON.stringify(user);
+//        $log.log(str);
+//        $scope.loading = 'indeterminate';
+//        $http({method: 'POST',
+//            url: '/register',
+//            data: str,
+//            responseType: 'json',
+//            ContentType: 'json/application'
+//        }).success(function (results) {
+//            $log.log(results);
+//        }).error(function (error) {
+//            $scope.loading = null;
+//            $log.log(error);
+//        });
+//    }//end register function
+//})
 
     /*
         Controller for landing page.
@@ -188,13 +223,43 @@ angular.module('app.controllers', [
 
     })
 
+    .controller('DialogController', function ($scope, $mdDialog, dataService, $http, $log) {
+        $scope.hide = function () {
+            $mdDialog.hide();
+        };
+        $scope.cancel = function () {
+            $mdDialog.cancel();
+        };
+        $scope.answer = function (answer) {
+            if(answer === 'send'){
+                shareTrip()
+            }
+            $mdDialog.hide(answer);
+        }
+
+        var trip = dataService.getItinerary();
+        shareTrip = function() {
+            var str = JSON.stringify([{email: $scope.receiverEmail, name: $scope.receiverName}, trip]);
+            $http({method: 'POST',
+                url: '/email',
+                data: str,
+                responseType: 'json',
+                ContentType: 'json/application'
+            }).success(function (results) {
+                $log.log(results);
+            }).error(function (error) {
+                $scope.loading = null;
+                $log.log(error);
+            });
+        }
+    })
     /*
         Controller for plan result display/edit:
         1) Google Maps
         2) Editing destinations from proposed itinerary
         3) Saving finalized itinerary to db
      */
-    .controller('PlanResultController', function ($scope, $mdDialog, $rootScope, $log, dataService, $window, $http) {
+    .controller('PlanResultController', function ($scope, $mdDialog, $log, dataService, $window, $http, $mdMedia) {
         $scope.authenticated = dataService.getAuthentication();
         $scope.user = {username: "testuser", name: "Cat"};
         //$scope.user = dataService.getUserInfo();
@@ -373,6 +438,7 @@ angular.module('app.controllers', [
 
         $scope.shareTrip = function(ev) {
             $log.log(ev);
+            showAdvanced(ev);
             //will make dialog later
 
             //var userData = {username: $scope.user.username};
@@ -425,12 +491,35 @@ angular.module('app.controllers', [
                 .ok('Plan New Trip')
                 .cancel('Go to Yelp');
             $mdDialog.show(confirm).then(function() {
+                dataService.clearResult();
                 var landingUrl = "http://" + $window.location.host + "/#/plan";
                 $window.location.href = landingUrl;
             }, function() {
                 $window.location.href = "http://www.yelp.com";
             });
         };
+
+        showAdvanced = function(ev) {
+
+            $mdDialog.show({
+                templateUrl: '../static/partials/dialog1.tmpl.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose:true,
+                fullscreen: $mdMedia('sm') && $scope.customFullscreen
+            })
+                .then(function(answer) {
+                    $scope.status = 'You said the information was "' + answer + '".';
+                }, function() {
+                    $scope.status = 'You cancelled the dialog.';
+                });
+            $scope.$watch(function() {
+                return $mdMedia('sm');
+            }, function(sm) {
+                $scope.customFullscreen = (sm === true);
+            });
+        };
     })
+
 
 ;
