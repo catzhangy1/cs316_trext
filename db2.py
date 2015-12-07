@@ -13,6 +13,13 @@ def connect_db():
         port='5432',
         host='localhost',
     )
+    #db = psycopg2.connect(
+    #    database='htencuzl',
+    #    user='htencuzl',
+    #    password='TSYmXOOWqoFMEQAx1lfRa3JZ2BbY-H6-',
+    #    port='5432',
+    #    host='pellefant-01.db.elephantsql.com',
+    #)
     return db
 
 # Don't call this. The database ia already set-up at this point.
