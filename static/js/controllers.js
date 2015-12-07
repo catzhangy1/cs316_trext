@@ -84,19 +84,12 @@ angular.module('app.controllers', [
     /*
         Controller for landing page.
      */
-    .controller('HomeCtrl', ['$scope','$log', '$window', '$http', function($scope, $log, $window, $http ) {
+    .controller('HomeCtrl', function($scope, $log, dataService) {
         $log.log('launched');
-        //$scope.getResults = function (){
-        //    $http.get('/search',null).
-        //        success(function(results){
-        //            $log.log(results);
-        //            $window.location.path = ('/results');
-        //        }).
-        //        error(function(error){
-        //            $log.log(error);
-        //        });
-        //};
-    }])
+        reset = function(){
+            dataService.clearResult();
+        }
+    })
 
 
     /*
@@ -411,6 +404,10 @@ angular.module('app.controllers', [
         };
 
         $scope.saveTrip = function(ev) {
+            if(!$scope.authenticated){
+                alert('you must be logged in to save a trip');
+                return;
+            }
             var userData = {username: $scope.user.username};
             var submit = $scope.results;
             submit.push(userData);
