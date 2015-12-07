@@ -13,7 +13,11 @@ import os
 import requests
 import urllib
 import base64
+import collections
 from random import randint
+import datetime
+import smtplib
+
 
 '''Configuring local Postgres Database on Shell
 postgres -D /usr/local/var/postgres -- starts up postgrespo
@@ -41,7 +45,7 @@ def subscribe():
     data = ast.literal_eval(request.data)
     db = db2.connect_db()
     db2.insert_into_db(db, [tuple(data)], "contact_list")
-    return 'success'
+    return 'success'    
 
 @app.route('/admin', methods=['POST'])
 def admin():
@@ -77,12 +81,67 @@ def search():
         final_dest_num =- 1
     return json.dumps(results_search)
 
+
 @app.route('/save', methods=['POST'])
 def save():
     '''add save trip method: for now request data dosn't have user's ID, just hardcode one'''
     data = ast.literal_eval(request.data)
 
+    db = db2.connect_db()
+    db1 = db2.connect_db()
+
+    tstamp = "str(10)"
+    userID= "wkc10"
+    # null check
+    # attraction
+    for i in range(len(data)):
+        attraction = data[i]
+        origin = "FALSE"
+        destination = "FALSE"
+        if i == 0:
+            origin = "TRUE"
+        if i == (len(data) - 1):
+            destination = "TRUE"
+        tstamp+=str(i)
+        trip = {
+            'attractionID': attraction.get('id'),
+            'tstamp': tstamp,
+            'userID': userID,
+            'origin': origin,
+            'destination': destination,
+        }
+
+        
+        db2.insert_attraction(db, attraction, "Attractions")
+        db2.insert_trip(db1, trip, "Trips")
+
+    # skip trip directory for now
     return "success"
+
+# this assumes passed back 'userID'
+@app.route("/History")
+def getTripHistory():
+    data = ast.literal_eval(request.data)
+    userID = data
+    db = db2.connect_db()
+    raw_trips = db2.get_history(db,userID)
+    return processed_trips
+
+
+@app.route("/login",methods=['POST'])
+def login():
+    data = ast.literal_eval(request.data)
+    user = data[0]
+    db = db2.connect_db()
+    return str(db2.get_user(db,user))
+
+@app.route('/register',methods=['POST'])
+def register():
+    data = ast.literal_eval(request.data)
+    user = data[0]
+    db = db2.connect_db()
+    return str(db2.insert_user(db,user))
+
 
 @app.route("/")
 def main():

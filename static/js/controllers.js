@@ -1,16 +1,87 @@
 angular.module('app.controllers', [
 
 ])
-    .controller('LoginController', function ($scope, $location, $rootScope) {
-        $scope.submit = function () {
-            if($scope.username == 'admin' && $scope.password == 'admin'){
-                console.log("here");
-                $rootScope.loggedIn = true;
-                $location.path('/post')
-            }else{
-                alert('Wrong Password');
-            }
-        };
+ .controller('LoginController', function ($http, $scope, $location, $rootScope, dataService) {
+      console.log("test login controller")
+      $scope.submit = function () {
+          var user = [];
+          user.push({
+                username: $scope.username,
+                password: $scope.password
+          });
+          console.log(user);
+            var str = JSON.stringify(user);
+            //server.log(str);
+            $scope.loading = 'indeterminate';
+            $http({method: 'POST',
+                url: '/login',
+                data: str,
+                responseType: 'json',
+                ContentType: 'json/application'
+            }).success(function (results) {
+                    if(results === "True"){
+                        $rootScope.loggedIn = true;
+                        dataService.authenticate({username:$scope.username});
+                        alert('Login Successful');  
+                         $location.path('/home');
+                    }
+                    else {
+                        alert('Wrong Username/Password');
+                    }
+                    //server.log(results);
+                    
+            }).error(function (error) {
+                    $scope.loading = null;
+                    //server.log(error);
+                    alert('Wrong Username/Password');
+            });
+          
+//          for(var i=0; i<users.length;i++){
+//              if($scope.username == users[i].username && $scope.password == users[i].password){
+//                  console.log("password correct");
+//                  $rootScope.loggedIn = true;
+//                  $location.path('/post')
+//              }      
+//          }
+//              if($rootScope.loggedIn != true){
+//                alert('Wrong Password');    
+//              }
+        };//end submit function 
+      $scope.register = function () {
+            console.log("test register")
+          var user = [];
+          user.push({
+                username: $scope.username,
+                password: $scope.password
+          });
+            var str = JSON.stringify(user);
+            console.log(str);
+            $scope.loading = 'indeterminate';
+            $http({method: 'POST',
+                url: '/register',
+                data: str,
+                responseType: 'json',
+                ContentType: 'json/application'
+            }).success(function (results) {
+                    dataService.authenticate({username:$scope.username});
+                    //server.log(results);
+                    alert('Registration Successful');  
+                    $location.path('/home');
+            }).error(function (error) {
+                    $scope.loading = null;
+                    //server.log(error);
+                    alert('Registration Unsuccessful');
+            });
+//          if($scope.password!=$scope.password1){
+//              alert('Passwords dont match');
+//          }else{
+//              users.push({
+//                    username: $scope.username,
+//                    password: $scope.password
+//              });
+//          }
+//        alert('Trying to Register');
+      }//end register function
     })
 
     /*

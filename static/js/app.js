@@ -74,7 +74,7 @@ angular.module('app', [
             resolve:{
                 "check": function($location, $rootScope){
                     if(!$rootScope.loggedIn){
-                        $location.path('/');
+                        $location.path('/login');
                     }
                 }
             },
@@ -84,18 +84,35 @@ angular.module('app', [
             resolve:{
                 "check": function($location, $rootScope){
                     if(!$rootScope.loggedIn){
-                        $location.path('/');
+                        $location.path('/login');
                     }
                 }
             },
             templateUrl: 'views/explore.html',
             controller: 'NavigationController'
         }).when('/plan', {
+            resolve:{
+                "check": function($location, $rootScope){
+                    if(!$rootScope.loggedIn){
+                        $location.path('/login');
+                    }
+                }
+            },
             templateUrl: '../static/partials/plan.html',
             //controller: 'EditorController'
         }).when('/plan-result', {
+            resolve:{
+                "check": function($location, $rootScope){
+                    if(!$rootScope.loggedIn){
+                        $location.path('/login');
+                    }
+                }
+            },
             templateUrl: '../static/partials/plan-result.html',
             controller: 'PlanResultController'
+       }).when('/login', {
+            templateUrl: '../static/partials/login.html',
+            controller: 'LoginController'
         }).otherwise({
             redirectTo: '/home'
         });
