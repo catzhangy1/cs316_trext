@@ -73,14 +73,6 @@ angular.module('app.controllers', [
         $scope.autocompleteDemoRequireMatch = true;
         $scope.readonly = false;
         $scope.loading = null;
-
-        $scope.prices = [
-            {'price':"$",'selected':'false'},
-            {'price':"$$",'selected':'false'},
-            {'price':"$$$",'selected':'false'},
-            {'price':"$$$$",'selected':'false'}
-        ];
-
         /*
         Input objects are initialized from dataService's TripInput
          */
@@ -89,7 +81,14 @@ angular.module('app.controllers', [
         $scope.destinations = data[1];
         $scope.activities = data[2];
         $scope.maxdest = data[3];
+        $scope.prices = data[4];
+        for(var j = 0; j < $scope.prices.length; j++){
+            if($scope.prices[j].selected){
+                $scope.budget = j+1;
+            }
+        }
 
+        $scope.tripname = "";
         /*
         Data needed for autocomplete function
          */
@@ -123,12 +122,27 @@ angular.module('app.controllers', [
             return results;
         };
 
-        $scope.submit = function(){
-            dataService.updateTripInput($scope.locations, $scope.destinations, $scope.activities, $scope.maxdest);
+        $scope.updateCheck = function(data){
+            //$log.log(data.selected);
+            var index = data.price.length - 1;
+            for(var i = 0; i < $scope.prices.length ; i++){
+                if(i != index){
+                    $scope.prices[i].selected = false;
+                }
+            }
+            $scope.budget = index + 1;
+            //$log.log($scope.budget);
+        }
 
+
+        $scope.submit = function(){
+            var finalbudget = $scope.budget + $scope.maxdest + 2;
+            dataService.updateTripInput($scope.locations, $scope.destinations, $scope.activities, $scope.maxdest, $scope.prices);
             var truncated = $scope.activities.map(function(obj) {return obj.alias});
-            var data = [$scope.locations.join("*"), $scope.destinations.join("*"), truncated.join("*"), $scope.maxdest];
+            var data = [$scope.locations.join("*"), $scope.destinations.join("*"), truncated.join("*"), finalbudget];
             $scope.loading = 'indeterminate';
+            $log.log($scope.budget);
+            $log.log($scope.maxdest);
             $http({method:'POST',
                 url: '/search',
                 data : data,
@@ -180,13 +194,16 @@ angular.module('app.controllers', [
         2) Editing destinations from proposed itinerary
         3) Saving finalized itinerary to db
      */
-    .controller('PlanResultController', function ($scope, $location, $rootScope, $log, dataService, $window, $http) {
+    .controller('PlanResultController', function ($scope, $mdDialog, $rootScope, $log, dataService, $window, $http) {
+        $scope.authenticated = dataService.getAuthentication();
+        $scope.user = {username: "testuser", name: "Cat"};
+        //$scope.user = dataService.getUserInfo();
         $scope.results = dataService.getItinerary();
-
         $scope.delete = function (item) {
             $scope.results.pop(item);
         };
-
+        $scope.o = $scope.results[0].name;
+        $scope.d = $scope.results[1].name;
         /*
         Google maps function
          */
@@ -204,21 +221,22 @@ angular.module('app.controllers', [
 
         function calculateAndDisplayRoute(directionsService, directionsDisplay) {
             var waypts = [];
-
-            for (var i = 2; i < $scope.results.length; i++) {
-                var ori = {lat: $scope.results[i].latitude, lng: $scope.results[i].longitude};
-                waypts.push({
-                    location: ori,
-                    stopover: true
-                });
-            }
-
-            //waypts.push({
-            //    location: "Duke University, Durham",
-            //    stopover: false
-            //});
             var ori = {lat: $scope.results[0].latitude, lng: $scope.results[0].longitude};
             var end = {lat: $scope.results[1].latitude, lng: $scope.results[1].longitude};
+            for (var i = 0; i < $scope.results.length; i++) {
+                var coordinate = {lat: $scope.results[i].latitude, lng: $scope.results[i].longitude};
+                if($scope.results[i].isOrigin){
+                    ori = coordinate;
+                } else if($scope.results[i].isDestination){
+                    end = coordinate;
+                } else{
+                    waypts.push({
+                        location: coordinate,
+                        stopover: true
+                    });
+                }
+
+            }
             directionsService.route({
                 origin: ori,
                 destination: end,
@@ -239,7 +257,6 @@ angular.module('app.controllers', [
         var infoWindow = new google.maps.InfoWindow();
 
         var createMarker = function (info){
-            $log.log(info);
             var marker = new google.maps.Marker({
                 map: $scope.map,
                 position: new google.maps.LatLng(info.latitude, info.longitude),
@@ -257,7 +274,6 @@ angular.module('app.controllers', [
         };
 
         for (i = 0; i < $scope.results.length; i++){
-            $log.log(i);
             createMarker($scope.results[i]);
         }
 
@@ -276,7 +292,52 @@ angular.module('app.controllers', [
             setMapOnAll(null);
         }
 
+        function processList(){
+            for(var i = 0 ; i < $scope.results.length; i++){
+                if($scope.results[i].name === $scope.o){
+                    $scope.results[i].isOrigin = true;
+                    $log.log("something good pls");
+                } else{
+                    $scope.results[i].isOrigin = false;
+                }
+                if($scope.results[i].name === $scope.d){
+                    $scope.results[i].isDestination = true;
+                } else{
+                    $scope.results[i].isDestination = false;
+                }
+            }
+        }
+
+        $scope.updateOrigin = function(item){
+            if(!item.isOrigin){
+                return;
+            }
+            for(var i =0; i<$scope.results.length; i++){
+                if($scope.results[i].name === item.name){
+                    $scope.results[i].isOrigin = true;
+                    //$scope.results[i].isDestination = false;
+                } else{
+                    $scope.results[i].isOrigin = false;
+                }
+            }
+        }
+
+        $scope.updateDestination = function(item){
+            if(!item.isDestination){
+                return;
+            }
+            for(var i =0; i<$scope.results.length; i++){
+                if($scope.results[i].name === item.name){
+                    $scope.results[i].isDestination = true;
+                    //$scope.results[i].isOrigin = false;
+                } else{
+                    $scope.results[i].isDestination = false;
+                }
+            }
+        }
+
         $scope.submit = function() {
+            processList();
             clearMarkers();
             calculateAndDisplayRoute(directionsService, directionsDisplay);
         }
@@ -290,9 +351,10 @@ angular.module('app.controllers', [
             $window.location.href = landingUrl;
         };
 
-        $scope.saveTrip = function() {
-            var str = JSON.stringify($scope.results);
-            $log.log(str);
+        $scope.saveTrip = function(ev) {
+            var userData = {username: $scope.user.username};
+            var tripData = {tripname: $scope.tripname};
+            var str = JSON.stringify([$scope.results, userData, tripData]);
             $scope.loading = 'indeterminate';
             $http({method: 'POST',
                 url: '/save',
@@ -300,10 +362,73 @@ angular.module('app.controllers', [
                 responseType: 'json',
                 ContentType: 'json/application'
             }).success(function (results) {
+                    showConfirm(ev);
                     $log.log(results);
             }).error(function (error) {
+                    showStupid(ev);
                     $scope.loading = null;
                     $log.log(error);
+            });
+        };
+
+        $scope.shareTrip = function(ev) {
+            $log.log(ev);
+            //will make dialog later
+
+            //var userData = {username: $scope.user.username};
+            //var tripData = {tripname: $scope.tripname};
+            //var str = JSON.stringify([$scope.results, userData, tripData]);
+            //$scope.loading = 'indeterminate';
+            //$http({method: 'POST',
+            //    url: '/save',
+            //    data: str,
+            //    responseType: 'json',
+            //    ContentType: 'json/application'
+            //}).success(function (results) {
+            //    showConfirm(ev);
+            //    $log.log(results);
+            //}).error(function (error) {
+            //    showStupid(ev);
+            //    $scope.loading = null;
+            //    $log.log(error);
+            //});
+        };
+        /*
+        DIALOGS TO HANDLE SAVE, SHARE, ETC.
+         */
+        showConfirm = function(ev) {
+            // Appending dialog to document.body to cover sidenav in docs app
+            var text = "Thank you, " + $scope.user.name + "! Feel free to plan another trip, share your trip, or just explore around!"
+            var confirm = $mdDialog.confirm()
+                .title('Your tripped has been saved successfully!')
+                .content(text)
+                .ariaLabel('Lucky day')
+                .targetEvent(ev)
+                .ok('Plan New Trip')
+                .cancel('Stick Around');
+            $mdDialog.show(confirm).then(function() {
+                var landingUrl = "http://" + $window.location.host + "/#/plan";
+                $window.location.href = landingUrl;
+            }, function() {
+                //do nothing!
+            });
+        };
+
+        showStupid = function(ev) {
+            // Appending dialog to document.body to cover sidenav in docs app
+            var text = "Sorry, " + $scope.user.name + "but we could not save your trip.";
+            var confirm = $mdDialog.confirm()
+                .title('Whoops!')
+                .content(text)
+                .ariaLabel('Bad day')
+                .targetEvent(ev)
+                .ok('Plan New Trip')
+                .cancel('Go to Yelp');
+            $mdDialog.show(confirm).then(function() {
+                var landingUrl = "http://" + $window.location.host + "/#/plan";
+                $window.location.href = landingUrl;
+            }, function() {
+                $window.location.href = "http://www.yelp.com";
             });
         };
     })

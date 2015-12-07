@@ -107,7 +107,7 @@
                           layout-wrap>
                 <div class="md-item-text md-whiteframe-z1" flex>
 
-                <md-checkbox md-no-ink aria-label="price.price" ng-model="price.selected">
+                <md-checkbox md-no-ink aria-label="price.price" ng-model="price.selected" ng-click="updateCheck(price)">
                     <h3>{{price.price}}</h3>
                 </md-checkbox>
                     </div>
@@ -124,7 +124,7 @@
         </div>
 
         <section layout="row" layout-align="center center" layout-wrap>
-            <md-button class="md-warn md-raised md-hue-2" style="width: 120px" ng-click="submit()">
+            <md-button class="md-warn md-raised md-hue-2" : 120px"style="width ng-click="submit()">
                 <md-icon md-svg-icon="../static/img/ic_check_circle_white_24px.svg"></md-icon> Submit </md-button>
             <md-button class="md-warn md-raised md-hue-2" ng-click="randomize()">
                 <md-icon md-svg-icon="../static/img/ic_grade_white_24px.svg"></md-icon> Randomize </md-button>

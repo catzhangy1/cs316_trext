@@ -1,42 +1,83 @@
-<div ng-controller="PlanResultController" >
-    <md-content class="md-padding" layout="column">
-        <md-toolbar class="md-theme-light">
-            <h2 class="md-toolbar-tools">
-                <span> Your Itinerary </span>
-            </h2>
-        </md-toolbar>
-        <md-content>
-            <md-list>
-                <md-list-item class="md-3-line" ng-repeat="item in results">
-                    <div class="md-list-item-text">
-                        <h3>{{item.name}}</h3>
-                        <h4> <i> {{item.category}} </i> </h4>
-                        <p>{{item.address}}</p>
-                        <p>{{item.phone}}</p>
-                    </div>
-                    <md-button class="md-icon-button reposition" aria-label="More" ng-click="delete(item)">
-                        <md-icon md-svg-icon="../static/img/ic_clear_black_24px.svg"></md-icon>
-                    </md-button>
+<!--<div ng-controller="PlanResultController" >-->
+<div id="result-container">
+<md-content class="md-padding" layout="column">
+    <md-toolbar class="md-theme-light">
+        <h2 class="md-toolbar-tools">
+            <span> Your Itinerary </span>
+        </h2>
+    </md-toolbar>
+    <md-subheader class="md-primary" style="background-color: #f0f8ff; margin-right: 0px">
+        <div style="float: right; margin-right: 70px; padding: 16px 0px 16px 16px;">
+            ORIGIN          DEST
+        </div>
+    </md-subheader>
+    <md-content>
 
-                    <md-divider ng-if="true"></md-divider>
-                </md-list-item>
-            </md-list>
-        </md-content>
-
-        <!--<div class="col-md-6">-->
-            <div id="map" style="width:500px; height:500px">I am here</div>
-            <div id="repeat" ng-repeat="marker in markers | orderBy : 'title'">
-                <a id="country_container" href="#" ng-click="openInfoWindow($event, marker)">
-                    <label id="names" >{{marker.title}}</label></a>
-            </div>
-        <!--</div>-->
-        <section layout="row" layout-align="center center" layout-wrap>
-            <md-button class="md-warn md-raised md-hue-2" ng-click="submit()">
-                <md-icon md-svg-icon="../static/img/ic_check_circle_white_24px.svg"></md-icon> Update Route </md-button>
-            <md-button class="md-warn md-raised md-hue-2" ng-click="saveTrip()">
-                <md-icon md-svg-icon="../static/img/ic_grade_white_24px.svg"></md-icon> Save </md-button>
-            <md-button class="md-warn md-raised md-hue-2" ng-click="navigateBack()">
-                <md-icon md-svg-icon="../static/img/ic_highlight_off_white_24px.svg"></md-icon> Back to Edit </md-button>
-        </section>
+        <md-list>
+            <md-list-item class="md-3-line" ng-repeat="item in results">
+                <div class="md-list-item-text">
+                    <h3>{{item.name}}</h3>
+                    <h4> <i> {{item.category}} </i> </h4>
+                    <p>{{item.address}}</p>
+                    <p>{{item.phone}}</p>
+                </div>
+                <md-button class="md-icon-button reposition" aria-label="More" ng-click="delete(item)">
+                    <md-icon md-svg-icon="../static/img/ic_clear_black_24px.svg"></md-icon>
+                </md-button>
+                <md-divider ng-if="true"></md-divider>
+            </md-list-item>
+        </md-list>
     </md-content>
+
+    <h2>Select Your Origin and Destination: </h2>
+    <div layout="row">
+        <md-input-container style="margin-right: 10px;">
+            <label>Origin</label>
+            <md-select ng-model="o">
+                <md-option ng-repeat="item in results" value="{{item.name}}">{{item.name}}</md-option>
+            </md-select>
+        </md-input-container>
+        <md-input-container>
+            <label>Destination</label>
+            <md-select ng-model="d">
+                <md-option ng-repeat="item in results" value="{{item.name}}">{{item.name}}</md-option>
+            </md-select>
+        </md-input-container>
+        <p>Path {{o}} going to {{d}}</p>
+    </div>
+
+    <div ng-if="authenticated">
+    <form name="userForm">
+        <div layout>
+            <md-input-container>
+                <label>Name Your Trip:</label>
+                <input ng-model="tripname">
+            </md-input-container>
+            <md-datepicker ng-model="tripdate" md-placeholder="Date of Trip (Optional)"></md-datepicker>
+        </div>
+    </form></div>
+
+    </div>
+    <!--<div class="col-md-6">-->
+    <div id="map" style="width:680px; height:500px">I am here</div>
+    <div id="repeat" ng-repeat="marker in markers | orderBy : 'title'">
+        <a id="country_container" href="#" ng-click="openInfoWindow($event, marker)">
+            <!--<label id="names" >{{marker.title}}</label>-->
+        </a>
+    </div>
+
+    <!--</div>-->
+    <section layout="row" layout-align="center center" layout-wrap>
+        <md-button class="md-warn md-raised md-hue-2" ng-click="submit()">
+            <md-icon md-svg-icon="../static/img/ic_check_circle_white_24px.svg"></md-icon> Update Route </md-button>
+        <md-button class="md-warn md-raised md-hue-2" style="width: 120px;" ng-click="saveTrip($event)">
+            <md-icon md-svg-icon="../static/img/ic_grade_white_24px.svg"></md-icon> Save </md-button>
+        <md-button class="md-warn md-raised md-hue-2" ng-click="shareTrip($event)">
+            <md-icon md-svg-icon="../static/img/ic_email_white_24px.svg"></md-icon> Share Trip </md-button>
+        <md-button class="md-warn md-raised md-hue-2" ng-click="navigateBack()">
+            <md-icon md-svg-icon="../static/img/ic_highlight_off_white_24px.svg"></md-icon> Back to Edit </md-button>
+    </section>
+</md-content>
 </div>
+<!--</div>-->
+
