@@ -15,33 +15,54 @@ angular.module('app', [
     dataService binds current Itinerary and Editor objects across modules
      */
     .service('dataService', function() {
+        var _user = null; //should be string
+        var _authenticated = false;
+
         var _locations = [];
         var _destinations = [];
-         var _activities = [];
+        var _activities = [];
         var _maxdest = 3;
         var _itinerary = [];
+        const _truePrices = [
+            {'price':"$",'selected':'false'},
+            {'price':"$$",'selected':'false'},
+            {'price':"$$$",'selected':'false'},
+            {'price':"$$$$",'selected':'false'}
+        ];
+        var _prices = _truePrices;
         return {
-            updateTripInput: function(location, destinations, activities, maxdest){
+            authenticateUser: function(user){ 
+                _authenticated = true;
+                _user = user;
+            },
+            getAuthentication: function(){
+                return _authenticated;
+            },
+            getUserInfo: function(){
+                return _user;
+            },
+            updateTripInput: function(location, destinations, activities, maxdest, prices){
                 _locations = location;
                 _destinations = destinations;
                 _activities = activities;
                 _maxdest = maxdest;
+                _prices = prices;
             },
             clearResult: function(){
                 _locations = [];
                 _destinations = [];
                 _activities = [];
                 _maxdest = 3;
+                _prices = _truePrices
             },
             getTripInput: function() {
-                return [_locations, _destinations, _activities, _maxdest];
+                return [_locations, _destinations, _activities, _maxdest, _prices];
             },
             addItinerary: function(data){
                 _itinerary = [];
                 _itinerary = data.filter(function(obj){
                     return !(obj==null);
                 }).map(function(obj){
-                    if(obj == null) {return; }
                       var add = obj.location.display_address.join(" ");
                       return {
                           id: obj.id,
@@ -51,7 +72,9 @@ angular.module('app', [
                           address: (add ? add : ""),
                           longitude: obj.location.coordinate.longitude,
                           latitude: obj.location.coordinate.latitude,
-                          imageURL : (obj.image_url ? obj.image_url : "")
+                          imageURL : (obj.image_url ? obj.image_url : ""),
+                          isOrigin: false,
+                          isDestination: false
                       }
                   })
               },
