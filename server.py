@@ -51,7 +51,36 @@ def search():
 def save():
     '''add save trip method: for now request data dosn't have user's ID, just hardcode one'''
     data = ast.literal_eval(request.data)
-    print data[0]
+
+    db = db2.connect_db()
+    db1 = db2.connect_db()
+
+    tstamp = "str(10)"
+    userID= "wkc10"
+    # null check
+    # attraction
+    for i in range(len(data)):
+        attraction = data[i]
+        origin = "FALSE"
+        destination = "FALSE"
+        if i == 0:
+            origin = "TRUE"
+        if i == (len(data) - 1):
+            destination = "TRUE"
+        tstamp+=str(i)
+        trip = {
+            'attractionID': attraction.get('id'),
+            'tstamp': tstamp,
+            'userID': userID,
+            'origin': origin,
+            'destination': destination,
+        }
+
+
+        db2.insert_attraction(db, attraction, "Attractions")
+        db2.insert_trip(db1, trip, "Trips")
+
+    # skip trip directory for now
     return "success"
 
 @app.route('/email', methods=['POST'])
