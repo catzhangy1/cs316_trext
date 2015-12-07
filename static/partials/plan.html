@@ -1,47 +1,8 @@
-<!--<section class="demo-container md-whiteframe-z1"-->
-         <!--ng-class="{'show-source': demoCtrl.$showSource}" >-->
-
-    <!--<md-toolbar class="demo-toolbar md-primary">-->
-        <!--<div class="md-toolbar-tools">-->
-            <!--<h3>{{demoCtrl.demoTitle}}</h3>-->
-            <!--<span flex></span>-->
-            <!--<md-button-->
-                    <!--class="md-icon-button"-->
-                    <!--aria-label="View Source"-->
-                    <!--ng-class="{ active: demoCtrl.$showSource }"-->
-                    <!--ng-click="demoCtrl.$showSource = !demoCtrl.$showSource">-->
-                <!--<md-tooltip md-autohide>View Source</md-tooltip>-->
-                <!--<md-icon md-svg-src="img/icons/ic_code_24px.svg"></md-icon>-->
-            <!--</md-button>-->
-            <!--<md-button-->
-                    <!--ng-hide="{{exampleNotEditable}}"-->
-                    <!--hide-sm-->
-                    <!--ng-click="demoCtrl.editOnCodepen()"-->
-                    <!--aria-label="Edit on CodePen"-->
-                    <!--class="md-icon-button">-->
-                <!--<md-tooltip md-autohide>Edit on CodePen</md-tooltip>-->
-                <!--<md-icon md-svg-src="img/icons/codepen-logo.svg"></md-icon>-->
-            <!--</md-button>-->
-        <!--</div>-->
-    <!--</md-toolbar>-->
-
-    <!--&lt;!&ndash; Source views &ndash;&gt;-->
-    <!--<md-tabs class="demo-source-tabs md-primary" ng-show="demoCtrl.$showSource" style="min-height: 0;">-->
-        <!--<md-tab ng-repeat="file in demoCtrl.orderedFiles" label="{{file.name}}">-->
-            <!--<md-content md-scroll-y class="demo-source-container">-->
-                <!--<hljs class="no-header" code="file.contentsPromise" lang="{{file.fileType}}" should-interpolate="demoCtrl.interpolateCode">-->
-                <!--</hljs>-->
-            <!--</md-content>-->
-        <!--</md-tab>-->
-    <!--</md-tabs>-->
-
-    <!--&lt;!&ndash; Live Demos &ndash;&gt;-->
-    <!--<demo-include files="demoCtrl.files" module="demoCtrl.demoModule" class="{{demoCtrl.demoId}}">-->
-    <!--</demo-include>-->
-<!--</section>-->
-<div ng-controller="EditorController" layout="column" ng-cloak>
-    <md-content class="md-padding" layout="column">
-        <h2 class="md-title">Locations - Up to 3</h2>
+<md-card flex-gt-sm="90" flex-gt-md="80">
+    <md-card-content >
+<div ng-controller="EditorController" ng-cloak>
+    <md-content class="md-padding" style="overflow: initial" layout="column">
+        <h2 class="md-title">Locations</h2>
         <md-chips
                 ng-model="locations"
                 class="custom-chips"
@@ -99,7 +60,7 @@
 
 
         <h2 class="md-title">Budget</h2>
-        <md-list>
+        <md-list layout-align="center center">
             <md-list-item md-no-ink
                             class="md-2-line veggie-option" ng-repeat="price in prices"
                           layout="row"
@@ -124,11 +85,11 @@
         </div>
 
         <section layout="row" layout-align="center center" layout-wrap>
-            <md-button class="md-warn md-raised md-hue-2" style="width: 120px" ng-click="submit()">
+            <md-button class="md-warn md-raised md-hue-2" style="margin-left: 10px; width: 125px" ng-click="submit()">
                 <md-icon md-svg-icon="../static/img/ic_check_circle_white_24px.svg"></md-icon> Submit </md-button>
-            <md-button class="md-warn md-raised md-hue-2" ng-click="randomize()">
+            <md-button class="md-warn md-raised md-hue-2" style="margin-left: 10px;" ng-click="randomize()">
                 <md-icon md-svg-icon="../static/img/ic_grade_white_24px.svg"></md-icon> Randomize </md-button>
-            <md-button class="md-warn md-raised md-hue-2" ng-click="reload()">
+            <md-button class="md-warn md-raised md-hue-2" style="margin-left: 10px;" ng-click="reload()">
                 <md-icon md-svg-icon="../static/img/ic_highlight_off_white_24px.svg"></md-icon>Start Over</md-button>
         </section>
         <div layout="row" layout-sm="column" layout-align="space-around">
@@ -136,3 +97,6 @@
         </div>
     </md-content>
 </div>
+
+    </md-card-content>
+</md-card>

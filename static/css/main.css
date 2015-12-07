@@ -130,6 +130,33 @@ body {
   background-color: #1489C4;
 }
 
+
+.md-content-main{
+  background-color: #eee;
+  padding-left:20px;
+  padding-right:20px;
+}
+
+
+md-content.md-default-theme {
+  background-color: #eee;
+}
+md-card {
+  background-color: #fff;
+}
+h2:first-of-type {
+  margin-top: 0;
+}
+
+h2 {
+  font-weight: 400;
+}
+
+md-toolbar:not(.md-hue-1),
+.md-fab {
+  fill: #fff;
+}
+
 hr{
 
 display: block;
@@ -463,9 +490,6 @@ code:not(.highlight) {
  ************/
 .site-sidenav {
   background: #106CC8;
-}
-.site-sidenav md-content {
-  background: transparent;
 }
 .site-sidenav,
 .site-sidenav.md-locked-open-add-active,

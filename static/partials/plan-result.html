@@ -1,18 +1,13 @@
-<!--<div ng-controller="PlanResultController" >-->
-<div id="result-container">
-<md-content class="md-padding" layout="column">
-    <md-toolbar class="md-theme-light">
+<div id="result-container" layout="row" style="text-align: center">
+    <md-card flex="33">
+        <md-card-content class="md-padding" layout="column">
+         <md-toolbar class="md-theme-light">
         <h2 class="md-toolbar-tools">
             <span> Your Itinerary </span>
         </h2>
     </md-toolbar>
-    <md-subheader class="md-primary" style="background-color: #f0f8ff; margin-right: 0px">
-        <div style="float: right; margin-right: 70px; padding: 16px 0px 16px 16px;">
-            ORIGIN          DEST
-        </div>
-    </md-subheader>
+    <md-subheader class="md-primary" style="background-color: #f0f8ff; margin-right: 0px"></md-subheader>
     <md-content>
-
         <md-list>
             <md-list-item class="md-3-line" ng-repeat="item in results">
                 <div class="md-list-item-text">
@@ -28,9 +23,12 @@
             </md-list-item>
         </md-list>
     </md-content>
+    </md-card-content>
+    </md-card>
 
-    <h2>Select Your Origin and Destination: </h2>
-    <div layout="row">
+    <md-card flex>
+        <md-card-content class="md-padding" layout="column">
+         <h2>Select Your Origin and Destination: </h2>
         <md-input-container style="margin-right: 10px;">
             <label>Origin</label>
             <md-select ng-model="o">
@@ -43,8 +41,6 @@
                 <md-option ng-repeat="item in results" value="{{item.name}}">{{item.name}}</md-option>
             </md-select>
         </md-input-container>
-        <p>Path {{o}} going to {{d}}</p>
-    </div>
 
     <div ng-if="authenticated">
     <form name="userForm">
@@ -57,16 +53,15 @@
         </div>
     </form></div>
 
-    </div>
     <!--<div class="col-md-6">-->
-    <div id="map" style="width:680px; height:500px">I am here</div>
+    <div id="map" style="width:640px; height:500px">I am here</div>
     <div id="repeat" ng-repeat="marker in markers | orderBy : 'title'">
         <a id="country_container" href="#" ng-click="openInfoWindow($event, marker)">
             <!--<label id="names" >{{marker.title}}</label>-->
         </a>
     </div>
 
-    <!--</div>-->
+            <md-divider></md-divider>
     <section layout="row" layout-align="center center" layout-wrap>
         <md-button class="md-warn md-raised md-hue-2" ng-click="submit()">
             <md-icon md-svg-icon="../static/img/ic_check_circle_white_24px.svg"></md-icon> Update Route </md-button>
@@ -77,7 +72,8 @@
         <md-button class="md-warn md-raised md-hue-2" ng-click="navigateBack()">
             <md-icon md-svg-icon="../static/img/ic_highlight_off_white_24px.svg"></md-icon> Back to Edit </md-button>
     </section>
-</md-content>
+    </md-content>
+    </md-card-content>
+</md-card>
 </div>
-<!--</div>-->
 

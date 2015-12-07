@@ -392,6 +392,10 @@ angular.module('app.controllers', [
         }
 
         $scope.submit = function() {
+            if($scope.o === $scope.d){
+                alert('uh-oh! Start and Destination must be different!');
+                return;
+            }
             processList();
             clearMarkers();
             calculateAndDisplayRoute(directionsService, directionsDisplay);
@@ -454,7 +458,7 @@ angular.module('app.controllers', [
 
         showStupid = function(ev) {
             // Appending dialog to document.body to cover sidenav in docs app
-            var text = "Sorry, " + $scope.user.name + "but we could not save your trip.";
+            var text = "Sorry, but we could not save your trip.";
             var confirm = $mdDialog.confirm()
                 .title('Whoops!')
                 .content(text)
