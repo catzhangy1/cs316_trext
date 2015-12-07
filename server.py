@@ -22,36 +22,6 @@ createdb -U admin testdb'''
 
 app = Flask(__name__)
 
-@app.route('/search-old', methods=['GET'])
-def testMethod3():
-    return db2.flask_field_query(db2.connect_db())
-
-@app.route('/notify', methods=['POST'])
-def emailSO():
-    data = ast.literal_eval(request.data)
-    print data;
-    print data[0];
-    print data[1];
-    print data[2];
-    notify.funtimes(db2.connect_db(), data[1], data[2], data[0])
-    return 'success'
-
-@app.route('/subscribe', methods=['POST'])
-def subscribe():
-    data = ast.literal_eval(request.data)
-    db = db2.connect_db()
-    db2.insert_into_db(db, [tuple(data)], "contact_list")
-    return 'success'
-
-@app.route('/admin', methods=['POST'])
-def admin():
-    data = ast.literal_eval(request.data)
-    db = db2.connect_db()
-    db2.insert_into_db(db, [tuple(data)])
-    # Check mailing list
-    notify.send_emails(db, [tuple(data)])
-    return 'success'
-
 @app.route('/search', methods=['POST'])
 def search():
     temp_search = []
@@ -81,8 +51,27 @@ def search():
 def save():
     '''add save trip method: for now request data dosn't have user's ID, just hardcode one'''
     data = ast.literal_eval(request.data)
-
+    print data[0]
     return "success"
+
+@app.route('/email', methods=['POST'])
+def email():
+    name = 'Catherine'
+    email = 'catzhangy1@gmail.com'
+    start = 'Duke University'
+    end = 'UNC Chapel Hill'
+
+    data = ast.literal_eval(request.data)
+    if(data[0]):
+        name = data[0]
+    if(data[1]):
+        email = data[1]
+    if(data[2]):
+        start = data[2]
+    if(data[3]):
+        end = data[3]
+    notify.sharetrip(name,email,start,end)
+    return "emailed"
 
 @app.route("/")
 def main():

@@ -1,7 +1,7 @@
 angular.module('app.controllers', [
 
 ])
-//controller('LoginController', function ($scope, dataService) {
+//controller('LoginController', function ($scope, dataService, $) {
 //    $scope.submit = function () {
 //        var user = [];
 //        user.push({
@@ -17,7 +17,8 @@ angular.module('app.controllers', [
 //            responseType: 'json',
 //            ContentType: 'json/application'
 //        }).success(function (results) {
-//            dataService.authenticate({username:$scope.username});
+
+//
 //            $log.log(results);
 //        }).error(function (error) {
 //            $scope.loading = null;
@@ -65,41 +66,6 @@ angular.module('app.controllers', [
         //};
     }])
 
-    /*
-        Controller for sharing trip via email
-     */
-    .controller('NotifyCtrl',
-    ['$scope','$log','$http',
-        function($scope, $log, $http) {
-            $scope.name = '';
-            $scope.rEmail = '';
-            $scope.sEmail = '';
-
-            $scope.submit = function() {
-                if($scope.name == '' && $scope.rEmail == '' && $scope.sEmail == ''){
-                    return;
-                }
-
-                $log.log($scope.name);
-                $log.log($scope.rEmail);
-                $log.log($scope.sEmail);
-                var data = [$scope.name, $scope.rEmail, $scope.sEmail];
-                var obj = {name: $scope.name, rEmail: $scope.rEmail, sEmail: $scope.sEmail};
-                $log.log(data.join(" "));
-                $http({method: "POST", url:"/notify", data:data}).
-                    success(function(results){
-                        $log.log(results);
-                        $scope.message = "Success!";
-                        $scope.list = results;
-
-                    }).
-                    error(function(error){
-                        $scope.message = "Failure! Please try again later";
-                        $log.log(error);
-                    });
-            }
-        }
-    ])
 
     /*
         Controller for the editor environment
@@ -223,7 +189,9 @@ angular.module('app.controllers', [
 
     })
 
-    .controller('DialogController', function ($scope, $mdDialog, dataService, $http, $log) {
+    .controller('DialogController', function ($scope, $mdDialog, $mdToast, dataService, $http, $log) {
+        $scope.name = "";
+        $scope.email = "";
         $scope.hide = function () {
             $mdDialog.hide();
         };
@@ -232,29 +200,44 @@ angular.module('app.controllers', [
         };
         $scope.answer = function (answer) {
             if(answer === 'send'){
-                shareTrip()
+                shareTrip();
             }
-            $mdDialog.hide(answer);
+            else{
+                $mdDialog.hide(answer);
+            }
         }
 
-        var trip = dataService.getItinerary();
-        var data = trip;
-        data.add({email: $scope.receiverEmail});
-        data.add({name: $scope.receiverName});
+        var results = dataService.getItinerary();
+
+        var origin = "Duke Unversity";
+        var end = "UNC Chapel Hill";
+        for(var i = 0; i < results.length; i++){
+            if(results[i].isOrigin){
+                origin = results[i].name;
+            }
+            if(results[i].isDestination){
+                end = results[i].name;
+            }
+        }
+
         shareTrip = function() {
-            var str = JSON.stringify(data);
+            var str = JSON.stringify([$scope.name, $scope.email, origin, end]);
+            $log.log(str);
             $http({method: 'POST',
                 url: '/email',
                 data: str,
                 responseType: 'json',
                 ContentType: 'json/application'
             }).success(function (results) {
-                $log.log(results);
+                //toast('Success!');
+                $scope.message="SUCCESS!";
             }).error(function (error) {
-                $scope.loading = null;
-                $log.log(error);
+                //toast('Failed. Try again!');
+                $scope.message="Send failed; Try Again!";
             });
         }
+
+
     })
     /*
         Controller for plan result display/edit:
@@ -267,6 +250,7 @@ angular.module('app.controllers', [
         $scope.user = "testuser";
         //$scope.user = dataService.getUserInfo();
         $scope.results = dataService.getItinerary();
+        $log.log($scope.results);
         $scope.delete = function (item) {
             $scope.results.pop(item);
         };
@@ -364,40 +348,11 @@ angular.module('app.controllers', [
             for(var i = 0 ; i < $scope.results.length; i++){
                 if($scope.results[i].name === $scope.o){
                     $scope.results[i].isOrigin = true;
-                    $log.log("something good pls");
                 } else{
                     $scope.results[i].isOrigin = false;
                 }
                 if($scope.results[i].name === $scope.d){
                     $scope.results[i].isDestination = true;
-                } else{
-                    $scope.results[i].isDestination = false;
-                }
-            }
-        }
-
-        $scope.updateOrigin = function(item){
-            if(!item.isOrigin){
-                return;
-            }
-            for(var i =0; i<$scope.results.length; i++){
-                if($scope.results[i].name === item.name){
-                    $scope.results[i].isOrigin = true;
-                    //$scope.results[i].isDestination = false;
-                } else{
-                    $scope.results[i].isOrigin = false;
-                }
-            }
-        }
-
-        $scope.updateDestination = function(item){
-            if(!item.isDestination){
-                return;
-            }
-            for(var i =0; i<$scope.results.length; i++){
-                if($scope.results[i].name === item.name){
-                    $scope.results[i].isDestination = true;
-                    //$scope.results[i].isOrigin = false;
                 } else{
                     $scope.results[i].isDestination = false;
                 }
@@ -421,10 +376,8 @@ angular.module('app.controllers', [
 
         $scope.saveTrip = function(ev) {
             var userData = {username: $scope.user.username};
-            var tripData = {tripname: $scope.tripname};
             var submit = $scope.results;
             submit.push(userData);
-            submit.push(tripData);
             var str = JSON.stringify(submit);
             $scope.loading = 'indeterminate';
             $http({method: 'POST',
@@ -443,27 +396,8 @@ angular.module('app.controllers', [
         };
 
         $scope.shareTrip = function(ev) {
-            $log.log(ev);
+            dataService.updateItinerary($scope.results);
             showAdvanced(ev);
-            //will make dialog later
-
-            //var userData = {username: $scope.user.username};
-            //var tripData = {tripname: $scope.tripname};
-            //var str = JSON.stringify([$scope.results, userData, tripData]);
-            //$scope.loading = 'indeterminate';
-            //$http({method: 'POST',
-            //    url: '/save',
-            //    data: str,
-            //    responseType: 'json',
-            //    ContentType: 'json/application'
-            //}).success(function (results) {
-            //    showConfirm(ev);
-            //    $log.log(results);
-            //}).error(function (error) {
-            //    showStupid(ev);
-            //    $scope.loading = null;
-            //    $log.log(error);
-            //});
         };
         /*
         DIALOGS TO HANDLE SAVE, SHARE, ETC.

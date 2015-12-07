@@ -31,7 +31,7 @@ angular.module('app', [
         ];
         var _prices = _truePrices;
         return {
-            authenticateUser: function(user){ 
+            authenticateUser: function(user){ //
                 _authenticated = true;
                 _user = user;
             },
@@ -59,9 +59,8 @@ angular.module('app', [
                 return [_locations, _destinations, _activities, _maxdest, _prices];
             },
             addItinerary: function(data){
-                _itinerary = [];
                 _itinerary = data.filter(function(obj){
-                    return !(obj==null);
+                    return !(obj===null);
                 }).map(function(obj){
                       var add = obj.location.display_address.join(" ");
                       return {

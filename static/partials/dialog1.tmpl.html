@@ -11,13 +11,10 @@
         </md-toolbar>
         <md-dialog-content>
             <div class="md-dialog-content">
-                <h2>Please enter your friend's email: </h2>
-                <p>
-                    Your itinerary will be shared to your friend. Invite them to join Trext! :D
-                </p>
+                <h2>Your itinerary will be shared to your friend. Invite them to join Trext! :D</h2>
                 <md-input-container class="md-block">
                     <label>Friend's Name</label>
-                    <input required name="clientName" placeholder="Professor Yang" ng-model="receiverName">
+                    <input required name="clientName" placeholder="Professor Yang" ng-model="name">
                     <div ng-messages="projectForm.clientName.$error">
                         <div ng-message="required">This is required.</div>
                     </div>
@@ -26,7 +23,7 @@
                 <br/>
                 <md-input-container class="md-block">
                     <label>Friend's Email</label>
-                    <input required type="email" name="clientEmail" ng-model="receiverEmail"
+                    <input required type="email" name="clientEmail" ng-model="email"
                            placeholder="jun.yang@duke.edu"
                            minlength="10" maxlength="100" ng-pattern="/^.+@.+\..+$/" />
                     <div ng-messages="projectForm.clientEmail.$error" role="alert">
@@ -44,6 +41,7 @@
             <md-button ng-click="answer('send')" style="margin-right:20px;">
                 Send
             </md-button>
+            <p><i>{{message}}</i></p>
         </md-dialog-actions>
     </form>
 </md-dialog>
