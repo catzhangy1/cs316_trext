@@ -15,7 +15,7 @@ angular.module('app', [
     dataService binds current Itinerary and Editor objects across modules
      */
     .service('dataService', function() {
-        var _user = null; //shoud be in the form of {name: name; username: username};
+        var _user = null; //should be string
         var _authenticated = false;
 
         var _locations = [];
@@ -31,7 +31,7 @@ angular.module('app', [
         ];
         var _prices = _truePrices;
         return {
-            authenticateUser: function(user){
+            authenticateUser: function(user){ 
                 _authenticated = true;
                 _user = user;
             },

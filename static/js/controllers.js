@@ -238,8 +238,11 @@ angular.module('app.controllers', [
         }
 
         var trip = dataService.getItinerary();
+        var data = trip;
+        data.add({email: $scope.receiverEmail});
+        data.add({name: $scope.receiverName});
         shareTrip = function() {
-            var str = JSON.stringify([{email: $scope.receiverEmail, name: $scope.receiverName}, trip]);
+            var str = JSON.stringify(data);
             $http({method: 'POST',
                 url: '/email',
                 data: str,
@@ -261,7 +264,7 @@ angular.module('app.controllers', [
      */
     .controller('PlanResultController', function ($scope, $mdDialog, $log, dataService, $window, $http, $mdMedia) {
         $scope.authenticated = dataService.getAuthentication();
-        $scope.user = {username: "testuser", name: "Cat"};
+        $scope.user = "testuser";
         //$scope.user = dataService.getUserInfo();
         $scope.results = dataService.getItinerary();
         $scope.delete = function (item) {
@@ -419,7 +422,10 @@ angular.module('app.controllers', [
         $scope.saveTrip = function(ev) {
             var userData = {username: $scope.user.username};
             var tripData = {tripname: $scope.tripname};
-            var str = JSON.stringify([$scope.results, userData, tripData]);
+            var submit = $scope.results;
+            submit.push(userData);
+            submit.push(tripData);
+            var str = JSON.stringify(submit);
             $scope.loading = 'indeterminate';
             $http({method: 'POST',
                 url: '/save',
@@ -500,7 +506,6 @@ angular.module('app.controllers', [
         };
 
         showAdvanced = function(ev) {
-
             $mdDialog.show({
                 templateUrl: '../static/partials/dialog1.tmpl.html',
                 parent: angular.element(document.body),
