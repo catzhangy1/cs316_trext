@@ -6,6 +6,7 @@ Created on Oct 10, 2015
 import db2
 import ast
 import notify
+import collections
 import yelp
 from flask import Flask, render_template, flash, redirect, url_for, Blueprint, request, g
 import json
@@ -55,8 +56,67 @@ def search():
 def save():
     '''add save trip method: for now request data dosn't have user's ID, just hardcode one'''
     data = ast.literal_eval(request.data)
-    print data[0]
+
+    db = db2.connect_db()
+    db1 = db2.connect_db()
+
+    tstamp = "str(10)"
+    userID= "wkc10"
+    # null check
+    # attraction
+    for i in range(len(data)):
+        attraction = data[i]
+        origin = "FALSE"
+        destination = "FALSE"
+        if i == 0:
+            origin = "TRUE"
+        if i == (len(data) - 1):
+            destination = "TRUE"
+        tstamp+=str(i)
+        trip = {
+            'attractionID': attraction.get('id'),
+            'tstamp': tstamp,
+            'userID': userID,
+            'origin': origin,
+            'destination': destination,
+        }
+
+        
+        db2.insert_attraction(db, attraction, "Attractions")
+        db2.insert_trip(db1, trip, "Trips")
+
+    # skip trip directory for now
     return "success"
+
+# this assumes passed back 'userID'
+@app.route("/History")
+def getTripHistory():
+    data = ast.literal_eval(request.data)
+    userID = data
+    db = db2.connect_db()
+    raw_trips = db2.get_history(db,userID)
+    
+    '''TODO'''
+    processed_trips = raw_trips 
+    
+    
+    return processed_trips
+
+
+@app.route("/login",methods=['POST'])
+def login():
+    data = ast.literal_eval(request.data)
+    user = data[0]
+    db = db2.connect_db()
+    return str(db2.get_user(db,user))
+
+@app.route('/register',methods=['POST'])
+def register():
+    data = ast.literal_eval(request.data)
+    user = data[0]
+    db = db2.connect_db()
+    return str(db2.insert_user(db,user))
+
 
 @app.route('/email', methods=['POST'])
 def email():

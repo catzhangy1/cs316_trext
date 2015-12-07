@@ -93,20 +93,23 @@ angular.module('app', [
             templateUrl:'../static/partials/home.html',
             controller:'HomeCtrl'
         }).when('/post', {
-            resolve:{
-                "check": function($location, $rootScope){
-                    if(!$rootScope.loggedIn){
+            resolve: {
+                "check": function ($location, $rootScope) {
+                    if (!$rootScope.loggedIn) {
                         $location.path('/');
                     }
                 }
             },
             templateUrl: 'views/post.html',
             controller: 'PostController'
+        }).when('/login', {
+            templateUrl: '../static/partials/login.html',
+            controller: 'LoginController'
         }).when('/explore', {
             resolve:{
                 "check": function($location, $rootScope){
                     if(!$rootScope.loggedIn){
-                        $location.path('/');
+                        $location.path('/login');
                     }
                 }
             },
