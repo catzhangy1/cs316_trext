@@ -1,0 +1,28 @@
+<div flex ng-cloak>
+
+    <p style="font-size:32px; float:left; color:#C0C0C0;"><i>Trips for {{user}}</i> </p>
+    <br/>
+    <md-grid-list
+            md-cols-sm="1" md-cols-md="2" md-cols-gt-md="8"
+            md-row-height-gt-md="1:1" md-row-height="4:3"
+            md-gutter="16px" md-gutter-gt-sm="16px" >
+
+        <md-grid-tile ng-repeat="trip in trips"
+                      md-rowspan="3"
+                      md-colspan="2"
+                     style="background-color:white; font-size: 12px; color: #606060;">
+            <md-grid-tile-header><h3>Trip {{$index}}</h3></md-grid-tile-header>
+            <br/>
+            <div layout="column">
+            <p><b>START:</b> {{trip[0].ori}}</p>
+            <md-list>
+                <md-list-item ng-repeat="item in trip[1]">
+                    <p> {{item}} </p>
+                </md-list-item>
+            </md-list>
+            <p><b>END:</b> {{trip[0].dest}}</p>
+            </div>
+        </md-grid-tile>
+
+    </md-grid-list>
+</div>

@@ -31,12 +31,16 @@ angular.module('app', [
         ];
         var _prices = _truePrices;
         return {
-            authenticateUser: function(user){ //
+            authenticate: function(user){ //
                 _authenticated = true;
                 _user = user;
             },
             getAuthentication: function(){
                 return _authenticated;
+            },
+            logout: function(){
+                _authenticated = false;
+                _user = "";
             },
             getUserInfo: function(){
                 return _user;
@@ -120,7 +124,9 @@ angular.module('app', [
             //controller: 'EditorController'
         }).when('/plan-result', {
             templateUrl: '../static/partials/plan-result.html',
-            controller: 'PlanResultController'
+        }).when('/trips',{
+            templateUrl: '../static/partials/trips.html',
+            controller: 'TripsController'
         }).otherwise({
             redirectTo: '/home'
         });

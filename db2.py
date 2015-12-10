@@ -3,23 +3,17 @@ Created on Nov 7, 2015
 @author: catzhangy2
 '''
 import psycopg2
+from sqlalchemy.ext.baked import Result
 
 
 def connect_db():
     db = psycopg2.connect(
         database='316',
-        user='postgres',
-        password='postgres',
+        user='catzhangy1',
+#         password='postgres',
         port='5432',
         host='localhost',
     )
-    #db = psycopg2.connect(
-    #    database='htencuzl',
-    #    user='htencuzl',
-    #    password='TSYmXOOWqoFMEQAx1lfRa3JZ2BbY-H6-',
-    #    port='5432',
-    #    host='pellefant-01.db.elephantsql.com',
-    #)
     return db
 
 # Don't call this. The database ia already set-up at this point.
@@ -37,17 +31,14 @@ def reset_tables(db):
 
 # Add entries into database. Must be well-formed.
 
-def get_history(db,userID):
-    if userID:
-        return query(
-            db,
-            "SELECT * FROM Trips WHERE userID = %s ORDER BY tstamp", userID,)
-
 def get_user(db,user):
     if user:
         q = "SELECT * FROM Users WHERE username = \'" + user.get('username') + "\' AND password = \'" + user.get('password') + "\'" + ";"
         result = query(db,q)
-        return result != None
+        print result
+        if len(result) == 0:
+            return "False"
+        return "True"
 
 # yayayayay shit code
 def insert_user(db, user):
@@ -55,7 +46,7 @@ def insert_user(db, user):
         try:
             c = db.cursor()
             c.execute(
-                """INSERT INTO Users (username, password) VALUES (%s,%s);""",(user.get('username'),user.get('password')))
+                """INSERT INTO Users (username, name, password, email) VALUES (%s,%s, %s,%s);""",(user.get('username'), user.get('name'),user.get('password'), user.get('email'),))
             db.commit()
             print "Successfully inserted entries into Users." 
             return True
@@ -70,7 +61,7 @@ def insert_attraction(db, attraction, table):
             
             c = db.cursor()
             c.execute(
-                """INSERT INTO Attractions(id,name,category,phone,address,longitude, latitude, imageurl) VALUES
+                """INSERT INTO Attractions(id,name,category,phone,address,longitude,latitude,imageurl) VALUES
     (%s,%s,%s,%s,%s,%s,%s,%s);""",(attraction.get('id'), attraction.get('name'),attraction.get('category'),attraction.get('phone'),attraction.get('address'),attraction.get('longitude'),attraction.get('latitude'),attraction.get('imageurl'),))
             db.commit()
             
@@ -89,9 +80,9 @@ def insert_trip(db, trip, table):
             c.execute(
     #             """INSERT INTO Trips(attractionID, tstamp, userID,origin,destination) VALUES
     # ('statue-of-liberty-new-york-3','Sun Dec 06 2015 00:36:09 GMT-0500 (EST)','tn52','TRUE','FALSE');""",)
-                """INSERT INTO Trips(attractionID, tstamp, userID,origin,destination) VALUES
-    (%s,%s,%s,%s,%s);""",
-    (trip.get('attractionID'),trip.get('tstamp'),trip.get('userID'),trip.get('origin'),trip.get('destination')))
+                """INSERT INTO Trips(attractionID, tstamp, userID,origin,destination,name) VALUES
+    (%s,%s,%s,%s,%s,%s);""",
+    (trip.get('attractionID'),trip.get('tstamp'),trip.get('userID'),trip.get('origin'),trip.get('destination'),trip.get('name')))
                 # """INSERT INTO Trips(attractionID, tstamp, userID) VALUES ('statue-of-liberty-new-york-555','Sun Dec 06 2015 00:36:09 GMT-0500 (EST)','tn52'))""",)
             db.commit()
 
@@ -133,9 +124,14 @@ def field_query(db, fields, table):
             ]),
         )
 
-# user field query
-# trip field query
-# attraction field query
-
-# user update?
-# trip update?
+def get_history(db,userID):
+    if userID:
+        q = "SELECT tstamp FROM Trips WHERE userID = \'" + userID + "\'" + " GROUP BY tstamp;"
+        unique_tstamps = query(db,q)
+        dic = []
+        i = 0
+        for s in unique_tstamps:
+            q = "SELECT * FROM Trips WHERE userID = \'" + userID + "\'" + " AND tstamp = \'" + s[0] + "\'" + ";"
+#             print query(db,q)
+            dic.append(query(db,q))
+        return dic

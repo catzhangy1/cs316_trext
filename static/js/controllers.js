@@ -1,8 +1,7 @@
 angular.module('app.controllers', [
 
 ])
-    .controller('LoginController', function ($http, $scope, $location, $rootScope, dataService) {
-        //console.log("test login controller")
+    .controller('LoginController', function ($http, $scope, $location, $rootScope, dataService, $log) {
         $scope.submit = function () {
             var user = [];
             user.push({
@@ -10,18 +9,17 @@ angular.module('app.controllers', [
                 password: $scope.password
             });
             var str = JSON.stringify(user);
-            //server.log(str);
             $scope.loading = 'indeterminate';
             $http({method: 'POST',
                 url: '/login',
                 data: str,
-                responseType: 'json',
                 ContentType: 'json/application'
             }).success(function (results) {
-                if(results === "True"){
+                if(results === 'Success'){
                     $rootScope.loggedIn = true;
-                    dataService.authenticate({username:$scope.username});
-                    alert('Login Successful');
+                    dataService.authenticate($scope.username);
+                    var text = "Welcome back, " + $scope.username + "!"
+                    alert(text);
                     $location.path('/home');
                 }
                 else {
@@ -32,23 +30,14 @@ angular.module('app.controllers', [
                 $scope.loading = null;
                 alert('Wrong Username/Password');
             });
-
-//          for(var i=0; i<users.length;i++){
-//              if($scope.username == users[i].username && $scope.password == users[i].password){
-//                  console.log("password correct");
-//                  $rootScope.loggedIn = true;
-//                  $location.path('/post')
-//              }
-//          }
-//              if($rootScope.loggedIn != true){
-//                alert('Wrong Password');
-//              }
         };//end submit function
         $scope.register = function () {
             var user = [];
             user.push({
                 username: $scope.username,
-                password: $scope.password
+                password: $scope.password,
+                name: $scope.name,
+                email: $scope.email
             });
             var str = JSON.stringify(user);
             //console.log(str);
@@ -59,7 +48,9 @@ angular.module('app.controllers', [
                 responseType: 'json',
                 ContentType: 'json/application'
             }).success(function (results) {
-                dataService.authenticate({username:$scope.username});
+                if(results === "Success"){
+                    dataService.authenticate({username:$scope.username});
+                }
                 //server.log(results);
                 alert('Registration Successful');
                 $location.path('/home');
@@ -84,8 +75,21 @@ angular.module('app.controllers', [
     /*
         Controller for landing page.
      */
-    .controller('HomeCtrl', function($scope, $log, dataService) {
-        $log.log('launched');
+    .controller('HomeCtrl', function($scope, $log, dataService, $window) {
+        $scope.authenticated = dataService.getAuthentication();
+
+        $scope.redirect = function(){
+            if($scope.authenticated){
+                $scope.authenticated = false;
+                dataService.logout();
+                var landingUrl = "http://" + $window.location.host + "/#/home";
+                $window.location.href = landingUrl;
+            } else{
+                $scope.authenticated = true;
+                var landingUrl = "http://" + $window.location.host + "/#/login";
+                $window.location.href = landingUrl;
+            }
+        }
         reset = function(){
             dataService.clearResult();
         }
@@ -149,7 +153,6 @@ angular.module('app.controllers', [
         };
 
         $scope.updateCheck = function(data){
-            //$log.log(data.selected);
             var index = data.price.length - 1;
             for(var i = 0; i < $scope.prices.length ; i++){
                 if(i != index){
@@ -157,7 +160,6 @@ angular.module('app.controllers', [
                 }
             }
             $scope.budget = index + 1;
-            //$log.log($scope.budget);
         }
 
 
@@ -167,14 +169,12 @@ angular.module('app.controllers', [
             var truncated = $scope.activities.map(function(obj) {return obj.alias});
             var data = [$scope.locations.join("*"), $scope.destinations.join("*"), truncated.join("*"), finalbudget];
             $scope.loading = 'indeterminate';
-            $log.log($scope.budget);
-            $log.log($scope.maxdest);
+
             $http({method:'POST',
                 url: '/search',
                 data : data,
                 responseType:'json'
                 }).success(function(results){
-                    $log.log(results);
                     /*
                     Update the dataService's current Itinerary!
                      */
@@ -247,7 +247,7 @@ angular.module('app.controllers', [
 
         shareTrip = function() {
             var str = JSON.stringify([$scope.name, $scope.email, origin, end]);
-            $log.log(str);
+
             $http({method: 'POST',
                 url: '/email',
                 data: str,
@@ -272,10 +272,9 @@ angular.module('app.controllers', [
      */
     .controller('PlanResultController', function ($scope, $mdDialog, $log, dataService, $window, $http, $mdMedia) {
         $scope.authenticated = dataService.getAuthentication();
-        $scope.user = "testuser";
-        //$scope.user = dataService.getUserInfo();
+        $scope.user = dataService.getUserInfo();
         $scope.results = dataService.getItinerary();
-        $log.log($scope.results);
+
         $scope.delete = function (item) {
             $scope.results.pop(item);
         };
@@ -404,23 +403,25 @@ angular.module('app.controllers', [
         };
 
         $scope.saveTrip = function(ev) {
-            if(!$scope.authenticated){
+            if(!dataService.getAuthentication()){
                 alert('you must be logged in to save a trip');
                 return;
             }
-            var userData = {username: $scope.user.username};
-            var submit = $scope.results;
-            submit.push(userData);
-            var str = JSON.stringify(submit);
+            dataSubmit = [];
+            dataSubmit.push(dataService.getUserInfo());
+            $scope.results.map(function(obj){
+                dataSubmit.push([obj.id, obj.name, obj.category, obj.phone, obj.address, obj.longitude, obj.latitude, obj.imageURL, obj.isOrigin
+                    , obj.isDestination].join("*"));
+            });
+
             $scope.loading = 'indeterminate';
             $http({method: 'POST',
                 url: '/save',
-                data: str,
+                data: dataSubmit,
                 responseType: 'json',
                 ContentType: 'json/application'
             }).success(function (results) {
                     showConfirm(ev);
-                    $log.log(results);
             }).error(function (error) {
                     showStupid(ev);
                     $scope.loading = null;
@@ -437,7 +438,7 @@ angular.module('app.controllers', [
          */
         showConfirm = function(ev) {
             // Appending dialog to document.body to cover sidenav in docs app
-            var text = "Thank you, " + $scope.user.name + "! Feel free to plan another trip, share your trip, or just explore around!"
+            var text = "Thank you, " + $scope.user + "! Feel free to plan another trip, share your trip, or just explore around!"
             var confirm = $mdDialog.confirm()
                 .title('Your tripped has been saved successfully!')
                 .content(text)
@@ -493,5 +494,34 @@ angular.module('app.controllers', [
         };
     })
 
+    .controller('TripsController', function ($scope, $log, $http, $window, dataService) {
+        $scope.user = dataService.getUserInfo();
 
+        $http({method:'GET',
+                url: '/history/' + dataService.getUserInfo()
+            }).success(function(results){
+                var temp = results.split("^");
+                temp.pop();
+                $scope.trips = temp.map(function(obj){
+                    var test = obj.split("*");
+                    test.pop();
+                    var origin, destination;
+                    var midways = [];
+                    for(var i= 0 ; i<test.length; i++){
+                        var fin = test[i].split("@");
+                        if(fin[3]=="true"){
+                            origin = fin[5];
+                        }  else if(fin[4]=="true"){
+                            destination = fin[5];
+                        } else{
+                            midways.push(fin[5]);
+                        }
+                    }
+                    return [{ori: origin, dest: destination}, midways];
+                });
+            }).error(function(error){
+                $scope.trips = [];
+                    $log.log(error);
+            });
+    });
 ;

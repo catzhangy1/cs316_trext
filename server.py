@@ -15,6 +15,8 @@ import requests
 import urllib
 import base64
 from random import randint
+import datetime
+import time
 
 '''Configuring local Postgres Database on Shell
 postgres -D /usr/local/var/postgres -- starts up postgrespo
@@ -54,61 +56,56 @@ def search():
 
 @app.route('/save', methods=['POST'])
 def save():
+
     '''add save trip method: for now request data dosn't have user's ID, just hardcode one'''
     data = ast.literal_eval(request.data)
 
     db = db2.connect_db()
     db1 = db2.connect_db()
-
-    tstamp = "str(10)"
-    userID= "wkc10"
-    # null check
-    # attraction
+    userID = data[0]
+    data = data[1:]
+#     dt_obj = time.time()
+#     tstamp = datetime.datetime.fromtimestamp(dt_obj).strftime('%Y-%m-%d %H:%M:%S')
+    tstamp = str(datetime.datetime.now())
+    
     for i in range(len(data)):
-        attraction = data[i]
-        origin = "FALSE"
-        destination = "FALSE"
-        if i == 0:
-            origin = "TRUE"
-        if i == (len(data) - 1):
-            destination = "TRUE"
-        tstamp+=str(i)
-        trip = {
-            'attractionID': attraction.get('id'),
-            'tstamp': tstamp,
-            'userID': userID,
-            'origin': origin,
-            'destination': destination,
+        parsed = data[i].split("*")
+        attraction = {
+            'id': parsed[0],
+            'name': parsed[1],
+            'category': parsed[2],
+            'phone': parsed[3],
+            'address': parsed[4],
+            'longitude': parsed[5],
+            'latitude': parsed[6],
+            'imageurl': parsed[7],
         }
-
-        
+        print attraction
+        trip = {
+            'attractionID': parsed[0],
+            'name': parsed[1],
+            'tstamp' : tstamp,
+            'userID': userID,
+            'origin': parsed[8],
+            'destination': parsed[9],
+        }
+        print "**"
+        print trip
         db2.insert_attraction(db, attraction, "Attractions")
         db2.insert_trip(db1, trip, "Trips")
 
     # skip trip directory for now
     return "success"
 
-# this assumes passed back 'userID'
-@app.route("/History")
-def getTripHistory():
-    data = ast.literal_eval(request.data)
-    userID = data
-    db = db2.connect_db()
-    raw_trips = db2.get_history(db,userID)
-    
-    '''TODO'''
-    processed_trips = raw_trips 
-    
-    
-    return processed_trips
-
-
 @app.route("/login",methods=['POST'])
 def login():
     data = ast.literal_eval(request.data)
     user = data[0]
     db = db2.connect_db()
-    return str(db2.get_user(db,user))
+    result = str(db2.get_user(db,user))
+    if result == "True":
+        return "Success"
+    return "Fail"
 
 @app.route('/register',methods=['POST'])
 def register():
@@ -120,11 +117,10 @@ def register():
 
 @app.route('/email', methods=['POST'])
 def email():
-    name = 'Catherine'
+    name = 'Catherine' ## default values for email :) 
     email = 'catzhangy1@gmail.com'
     start = 'Duke University'
     end = 'UNC Chapel Hill'
-
     data = ast.literal_eval(request.data)
     if(data[0]):
         name = data[0]
@@ -137,6 +133,21 @@ def email():
     notify.sharetrip(name,email,start,end)
     return "emailed"
 
+@app.route('/history/<username>', methods=['GET'])
+def history(username):
+    db = db2.connect_db()
+    raw_trips = db2.get_history(db, username)
+    
+    all_trips = ""
+    for trip in raw_trips:
+        all_attractions = ""
+        for list_attractions in trip:
+            all_attractions += "@".join(list_attractions)
+            all_attractions += "*"
+        all_trips += all_attractions
+        all_trips += "^"
+    return all_trips
+    
 @app.route("/")
 def main():
     return render_template('index.html', name='hello')

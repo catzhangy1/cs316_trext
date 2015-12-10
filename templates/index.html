@@ -26,6 +26,9 @@
     <link href="../static/css/home.css" rel="stylesheet">
     <link href="../static/css/angular-material.css" rel="stylesheet">
       <script src="http://maps.googleapis.com/maps/api/js?sensor=false&language=en"></script>
+
+    <script src="../static/js/app.js"></script>
+    <script src="../static/js/controllers.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
 
@@ -47,15 +50,25 @@
         <md-button md-no-ink>
           <a href="/#/home">Home</a>
         </md-button>
-        <md-button md-no-ink>
+        <md-button md-no-ink ng-click="reset()">
           <a href="/#/plan">Plan</a>
         </md-button>
         <md-button md-no-ink>
           <a href="/#/explore">Explore</a>
         </md-button>
-        <md-button md-no-ink>
-          <a href="/#/login">Login</a>
-        </md-button>
+        <div ng-if="!(authenticated)">
+          <md-button md-no-ink ng-click="redirect()">
+            Login
+          </md-button>
+        </div>
+        <div ng-if="(authenticated)">
+          <md-button md-no-ink>
+            <a href="/#/trips">Trips</a>
+          </md-button>
+          <md-button md-no-ink ng-click="redirect()">
+            Logout
+          </md-button>
+        </div>
       </div>
     </md-toolbar>
     <md-content flex md-scroll-y class="md-content-main">
@@ -66,40 +79,5 @@
       </md-content>
     </div>
   </body>
-  <!--<body>-->
-    <!--<div class="site-wrapper">-->
-      <!--<div class="site-wrapper-inner">-->
-        <!--<div class="cover-container">-->
-          <!--<div class="masthead clearfix">-->
-            <!--&lt;!&ndash;<div class="inner">&ndash;&gt;-->
-              <!--<h3 class="masthead-brand">Trext</h3>-->
-              <!--<nav>-->
-                <!--<ul class="nav masthead-nav">-->
-                  <!--<li class="active"><a href="#">Home</a></li>-->
-                    <!--<li><a href="/#/plan">Plan</a></li>-->
-                    <!--<li><a href="/#/explore">Explore</a></li>-->
-                    <!--<li><a href="/#/login">Login</a></li>-->
-                <!--</ul>-->
-              <!--</nav>-->
-            <!--&lt;!&ndash;</div>&ndash;&gt;-->
-          <!--</div>-->
-        <!--<div class="container">-->
-             <!--&lt;!&ndash;container for the main view&ndash;&gt;-->
-            <!--<div ng-view></div>-->
-          <!--&lt;!&ndash;<div class="mastfoot">&ndash;&gt;-->
-            <!--&lt;!&ndash;<div class="inner">&ndash;&gt;-->
-              <!--&lt;!&ndash;<p> Trext - CS316 </p>&ndash;&gt;-->
-            <!--&lt;!&ndash;</div>&ndash;&gt;-->
-          <!--&lt;!&ndash;</div>&ndash;&gt;-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>-->
-    <script src="../static/js/app.js"></script>
-    <script src="../static/js/controllers.js"></script>
-    <!--<script src="../../dist/js/bootstrap.min.js"></script>-->
   </body>
 </html>

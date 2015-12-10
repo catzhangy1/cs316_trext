@@ -1,4 +1,4 @@
-<div id="result-container" layout="row" style="text-align: center">
+<div id="result-container" ng-controller="PlanResultController" layout="row" style="text-align: center">
     <md-card flex="33">
         <md-card-content class="md-padding" layout="column">
          <md-toolbar class="md-theme-light">
@@ -43,15 +43,11 @@
         </md-input-container>
 
     <div ng-if="authenticated">
-    <form name="userForm">
-        <div layout>
-            <md-input-container>
-                <label>Name Your Trip:</label>
-                <input ng-model="tripname">
-            </md-input-container>
-            <md-datepicker ng-model="tripdate" md-placeholder="Date of Trip (Optional)"></md-datepicker>
-        </div>
-    </form></div>
+        <md-input-container class="md-block">
+            <label>Trip Name</label>
+            <input required name="tripName" placeholder="Enter a unique trip name" ng-model="tname">
+        </md-input-container>
+    </div>
 
     <!--<div class="col-md-6">-->
     <div id="map" style="width:640px; height:500px">I am here</div>
@@ -60,7 +56,6 @@
             <!--<label id="names" >{{marker.title}}</label>-->
         </a>
     </div>
-
             <md-divider></md-divider>
     <section layout="row" layout-align="center center" layout-wrap>
         <md-button class="md-warn md-raised md-hue-2" ng-click="submit()">

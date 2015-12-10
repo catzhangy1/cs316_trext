@@ -35,6 +35,11 @@ Notable features:
 
 **Future Plans** <br>
 
-> 1. <b>":)"</b>
+> 1. <b>Strengthen authentication system - </b> Add protection against attacks, enable browser-wide sessions, integration with
+        with other social media accounts.
 
-> 2. <b>":)"</b>
+> 2. <b>Stronger search algorithm</b> Currently, the activities do not add much to our search research because the categories
+        tend to be obscure. Find a way to suggest categories that are general and appropriate to our users' interests.
+
+> 3. <b>Enhanced views, trips sharing</b> Build a community of trip-sharing with features like reviews on trips, pinterest
+        -like community on trip sharing, etc.

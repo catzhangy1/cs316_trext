@@ -29,9 +29,10 @@ PRIMARY KEY(stamp)
 );
 
 CREATE TABLE Trips
-(attractionID VARCHAR(256) NOT NULL references Attractions(id),
- tstamp VARCHAR(256) NOT NULL references TripDirectory(stamp),
- userID VARCHAR(256) NOT NULL references Users(username),
+(attractionID VARCHAR(256) NOT NULL,
+ name VARCHAR(256) NOT NULL,
+ tstamp VARCHAR(256) NOT NULL,
+ userID VARCHAR(256) NOT NULL,
  UNIQUE(attractionID, tstamp, userID));
 
 INSERT INTO Users(username,name,password,email) VALUES
